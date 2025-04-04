@@ -41,6 +41,14 @@ variable "resource_names_map" {
       name       = "sc"
       max_length = 63
     }
+    diagnostic_setting = {
+      name       = "ds"
+      max_length = 80
+    }
+    log_analytics_workspace = {
+      name       = "law"
+      max_length = 80
+    }
   }
 }
 
@@ -266,39 +274,104 @@ variable "network_rules" {
   default = null
 }
 
-# # storage container properties
-# variable "storage_containers" {
-#   description = "A map of storage container configurations."
-#   type = map(object({
-#     name                  = string
-#     container_access_type = optional(string, null)
-#     default_encryption_scope = optional(string, null)
-#     encryption_scope_override_enabled = optional(bool, null)
-#     metadata              = optional(map(string), null)
-#   }))
-#   default = {}
-# }
+# Monitor Action Group Properties
+variable "action_group" {
+  description = <<EOT
+  An action group object. Each action group can have:
+  - short_name: (Required) The short name of the action group
+  - arm_role_receivers: (Optional) List of ARM role receivers
+  - email_receivers: (Optional) List of email receivers
+  EOT
+  type = object({
+    name       = string
+    short_name = string
+    arm_role_receivers = optional(list(object({
+      name                    = string
+      role_id                 = string
+      use_common_alert_schema = optional(bool)
+    })), [])
+    email_receivers = optional(list(object({
+      name                    = string
+      email_address           = string
+      use_common_alert_schema = optional(bool)
+    })), [])
+  })
+  default = null
+}
 
-# variable "container_access_type" {
-#   description = "The access type of the storage container."
-#   type        = string
-#   default     = null
-# }
+# Monitor Metric Alert Properties
+variable "metric_alerts" {
+  type = map(object({
+    description        = optional(string)
+    frequency          = optional(string)
+    severity           = optional(number)
+    enabled            = optional(bool)
+    webhook_properties = optional(map(string))
+    criteria = optional(list(object({
+      metric_namespace       = string
+      metric_name            = string
+      aggregation            = string
+      operator               = string
+      threshold              = number
+      skip_metric_validation = optional(bool, false)
+      dimensions = optional(list(object({
+        name     = string
+        operator = string
+        values   = list(string)
+      })), [])
+    })))
+    dynamic_criteria = optional(object({
+      metric_namespace       = string
+      metric_name            = string
+      aggregation            = string
+      operator               = string
+      alert_sensitivity      = string
+      ignore_data_before     = optional(string)
+      skip_metric_validation = optional(bool, false)
+      dimensions = optional(list(object({
+        name     = string
+        operator = string
+        values   = list(string)
+      })), [])
+    }))
+  }))
+  default = {}
+}
 
-# variable "default_encryption_scope" {
-#   description = "The default encryption scope for the storage container."
-#   type        = string
-#   default     = null
-# }
+variable "diagnostic_settings" {
+  type = map(object({
+    enabled_log = optional(list(object({
+      category_group = optional(string, "allLogs")
+      category       = optional(string, null)
+    })))
+    metric = optional(object({
+      category = optional(string)
+      enabled  = optional(bool)
+      # retention_policy = optional(object({
+      #   enabled = bool
+      #   days    = number
+      # }))
+    }))
+  }))
+  default = {}
+}
 
-# variable "encryption_scope_override_enabled" {
-#   description = "Specifies if encryption scope override is enabled."
-#   type        = bool
-#   default     = null
-# }
+variable "log_analytics_workspace" {
+  type = object({
+    sku               = string
+    retention_in_days = number
+    daily_quota_gb    = number
+    identity = optional(object({
+      type         = string
+      identity_ids = optional(list(string))
+    }))
+    local_authentication_disabled = optional(bool)
+  })
+  default = null
+}
 
-# variable "metadata" {
-#   description = "A mapping of metadata to assign to the storage container."
-#   type        = map(string)
-#   default     = null
-# }
+variable "log_analytics_workspace_id" {
+  type        = string
+  description = "(Optional) The ID of the Log Analytics Workspace."
+  default     = null
+}

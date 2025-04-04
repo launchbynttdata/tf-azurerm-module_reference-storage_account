@@ -12,7 +12,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
-	armStorage "github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/launchbynttdata/lcaf-component-terratest/types"
 	"github.com/stretchr/testify/assert"
@@ -35,12 +35,12 @@ func TestStorageAccount(t *testing.T, ctx types.TestContext) {
 		},
 	}
 
-	storageAccountClient, err := armStorage.NewAccountsClient(subscriptionId, credential, &options)
+	storageAccountClient, err := armstorage.NewAccountsClient(subscriptionId, credential, &options)
 	if err != nil {
 		t.Fatalf("Error getting Storage Account client: %v", err)
 	}
 
-	t.Run("doesStorageAccountExist", func(t *testing.T) {
+	t.Run("DoesStorageAccountExist", func(t *testing.T) {
 		resourceGroupName := terraform.Output(t, ctx.TerratestTerraformOptions(), "resource_group_name")
 		storageAccountName := terraform.Output(t, ctx.TerratestTerraformOptions(), "name")
 
@@ -54,7 +54,6 @@ func TestStorageAccount(t *testing.T, ctx types.TestContext) {
 
 	t.Run("RequestDefaultIndexFromStaticWebsiteStorageAccount", func(t *testing.T) {
 		ctx.EnabledOnlyForTests(t, "static_website")
-
 		webEndpoint := terraform.Output(t, ctx.TerratestTerraformOptions(), "web_endpoint")
 
 		resp, err := http.Get(webEndpoint)
