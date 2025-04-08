@@ -299,6 +299,12 @@ variable "action_group" {
   default = null
 }
 
+variable "action_group_ids" {
+  description = "A list of action group IDs."
+  type        = list(string)
+  default     = []
+}
+
 # Monitor Metric Alert Properties
 variable "metric_alerts" {
   type = map(object({

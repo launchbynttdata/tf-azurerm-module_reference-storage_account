@@ -48,25 +48,6 @@ module "storage_account" {
     }
   })
 
-  # account_tier              = var.account_tier
-  # account_replication_type  = var.account_replication_type
-  # storage_containers        = var.storage_containers
-  # storage_shares            = var.storage_shares
-  # storage_queues            = var.storage_queues
-  # static_website            = var.static_website
-  # enable_https_traffic_only = var.enable_https_traffic_only
-  # access_tier               = var.access_tier
-  # account_kind              = var.account_kind
-
-  # blob_cors_rule                         = var.blob_cors_rule
-  # blob_delete_retention_policy           = var.blob_delete_retention_policy
-  # blob_versioning_enabled                = var.blob_versioning_enabled
-  # blob_change_feed_enabled               = var.blob_change_feed_enabled
-  # blob_last_access_time_enabled          = var.blob_last_access_time_enabled
-  # blob_container_delete_retention_policy = var.blob_container_delete_retention_policy
-  # public_network_access_enabled          = var.public_network_access_enabled
-  # network_rules                          = var.network_rules
-
   action_group = coalesce({
     name       = "example-action-group"
     short_name = "exag"
@@ -88,7 +69,7 @@ module "storage_account" {
   metric_alerts = merge(var.metric_alerts, {
     storage_availability = {
       description = "Alert when storage availability drops"
-      frequency   = "PT5M" # 5 minutes
+      frequency   = "PT5M"
       severity    = 2
       enabled     = true
       criteria = [{
@@ -97,30 +78,33 @@ module "storage_account" {
         aggregation      = "Average"
         operator         = "LessThan"
         threshold        = 99.9
-        dimensions = [{
-          name     = "AccountName"
-          operator = "Include"
-          values   = ["*"]
-        }]
       }]
     },
-    storage_used_capacity = {
-      description = "Alert on storage capacity changes"
-      frequency   = "PT15M" # 15 minutes
+    e2e_latency = {
+      description = "Alert on storage latency"
+      frequency   = "PT5M"
       severity    = 3
       enabled     = true
+      window_size = "PT15M"
       criteria    = []
       dynamic_criteria = {
         metric_namespace  = "Microsoft.Storage/storageAccounts"
-        metric_name       = "UsedCapacity"
+        metric_name       = "SuccessE2ELatency"
         aggregation       = "Average"
         operator          = "GreaterThan"
         alert_sensitivity = "Medium"
-        dimensions = [{
-          name     = "AccountName"
-          operator = "Include"
-          values   = ["*"]
-        }]
+        # dimensions = [
+        #   {
+        #     name     = "ApiName"
+        #     operator = "Include"
+        #     values   = ["*"]  // Monitor all API operations
+        #   },
+        #   {
+        #     name     = "GeoType"
+        #     operator = "Include"
+        #     values   = ["Primary"]  // Monitor primary storage only
+        #   }
+        # ]
       }
     },
     storage_transactions = {
@@ -153,42 +137,8 @@ module "storage_account" {
 
   diagnostic_settings = merge(var.diagnostic_settings, {
     transactions = {
-      enabled_log = [
-        {
-          category_group = "allLogs"
-          category       = "StorageRead"
-        },
-        {
-          category_group = "allLogs"
-          category       = "StorageWrite"
-        },
-        {
-          category_group = "allLogs"
-          category       = "StorageDelete"
-        }
-      ]
       metric = {
         category = "Transaction"
-        enabled  = true
-      }
-    }
-    capacity = {
-      enabled_log = [
-        {
-          category_group = "allLogs"
-          category       = "StorageRead"
-        },
-        {
-          category_group = "allLogs"
-          category       = "StorageWrite"
-        },
-        {
-          category_group = "allLogs"
-          category       = "StorageDelete"
-        }
-      ]
-      metric = {
-        category = "Capacity"
         enabled  = true
       }
     }

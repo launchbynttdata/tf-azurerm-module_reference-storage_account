@@ -84,8 +84,9 @@ module "monitor_action_group" {
 }
 
 module "monitor_metric_alert" {
-  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm"
-  version = "~> 1.1"
+  # source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm"
+  # version = "~> 1.1"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-monitor_metric_alert.git//.?ref=feature!/expand-variables"
 
   for_each            = var.metric_alerts
   name                = each.key
@@ -95,7 +96,7 @@ module "monitor_metric_alert" {
   frequency           = each.value.frequency
   severity            = each.value.severity
   enabled             = each.value.enabled
-  action_group_ids    = module.monitor_action_group[0].action_group_id
+  action_group_ids    = concat([module.monitor_action_group[0].action_group_id], var.action_group_ids)
   webhook_properties  = each.value.webhook_properties
   criteria            = each.value.criteria
   dynamic_criteria    = each.value.dynamic_criteria
