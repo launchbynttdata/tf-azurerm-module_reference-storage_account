@@ -84,9 +84,8 @@ module "monitor_action_group" {
 }
 
 module "monitor_metric_alert" {
-  # source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm"
-  # version = "~> 1.1"
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-monitor_metric_alert.git//.?ref=feature!/expand-variables"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm"
+  version = "~> 2.0"
 
   for_each            = var.metric_alerts
   name                = each.key
