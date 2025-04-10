@@ -137,10 +137,14 @@ module "storage_account" {
 
   diagnostic_settings = merge(var.diagnostic_settings, {
     transactions = {
-      metric = {
+      metrics = [{
         category = "Transaction"
         enabled  = true
-      }
+        },
+        {
+          category = "Capacity"
+          enabled  = true
+      }]
     }
   })
 
