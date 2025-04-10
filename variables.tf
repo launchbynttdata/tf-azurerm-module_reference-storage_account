@@ -236,7 +236,7 @@ variable "blob_versioning_enabled" {
 }
 
 variable "blob_change_feed_enabled" {
-  description = "Is the blobl service properties for change feed enabled for blob"
+  description = "Is the blob service properties for change feed enabled for blob"
   type        = bool
   default     = false
 }
