@@ -122,12 +122,11 @@ module "log_analytics_workspace" {
 }
 
 module "diagnostic_setting" {
-  # source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm"
-  # version = "~> 1.0"
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-monitor_diagnostic_setting.git//.?ref=feature!/update-var-metric"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm"
+  version = "~> 3.0"
 
   for_each                   = var.diagnostic_settings
-  name                       = module.resource_names["diagnostic_setting"].standard
+  name                       = each.key
   target_resource_id         = module.storage_account.id
   log_analytics_workspace_id = coalesce(module.log_analytics_workspace[0].id, var.log_analytics_workspace_id)
   enabled_log                = each.value.enabled_log
