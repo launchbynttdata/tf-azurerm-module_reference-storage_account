@@ -33,14 +33,6 @@ variable "resource_names_map" {
       name       = "sa"
       max_length = 24
     }
-    storage_container = {
-      name       = "sc"
-      max_length = 63
-    }
-    diagnostic_setting = {
-      name       = "ds"
-      max_length = 80
-    }
     log_analytics_workspace = {
       name       = "law"
       max_length = 80
@@ -193,9 +185,3 @@ variable "log_analytics_workspace" {
   })
   default = null
 }
-
-# variable "log_analytics_workspace_id" {
-#   type        = string
-#   description = "(Optional) The ID of the Log Analytics Workspace."
-#   default     = null
-# }
