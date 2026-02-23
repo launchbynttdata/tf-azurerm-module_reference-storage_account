@@ -38,15 +38,23 @@ module "resource_group" {
 module "storage_account" {
   source = "../.."
 
-  resource_group_name  = local.resource_group_name
-  location             = var.location
-  storage_account_name = coalesce(var.storage_account_name, local.storage_account_name)
+  resource_names_map         = var.resource_names_map
+  resource_group_name        = local.resource_group_name
+  location                   = var.location
+  storage_account_name       = coalesce(var.storage_account_name, local.storage_account_name)
+  file_share_backup_policies = var.file_share_backup_policies
+
   storage_containers = merge(var.storage_containers, {
     storage_container_1 = {
       name                  = "container1"
       container_access_type = "private"
     }
   })
+
+  recovery_services_vault      = var.recovery_services_vault
+  data_protection_backup_vault = var.data_protection_backup_vault
+  blob_backup_policies         = var.blob_backup_policies
+  file_share_backups           = var.file_share_backups
 
   action_group = coalesce({
     name       = "example-action-group"
@@ -93,18 +101,6 @@ module "storage_account" {
         aggregation       = "Average"
         operator          = "GreaterThan"
         alert_sensitivity = "Medium"
-        # dimensions = [
-        #   {
-        #     name     = "ApiName"
-        #     operator = "Include"
-        #     values   = ["*"]  // Monitor all API operations
-        #   },
-        #   {
-        #     name     = "GeoType"
-        #     operator = "Include"
-        #     values   = ["Primary"]  // Monitor primary storage only
-        #   }
-        # ]
       }
     },
     storage_transactions = {

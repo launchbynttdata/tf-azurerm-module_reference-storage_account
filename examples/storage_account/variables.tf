@@ -185,3 +185,28 @@ variable "log_analytics_workspace" {
   })
   default = null
 }
+
+variable "recovery_services_vault" {
+  type    = any
+  default = null
+}
+
+variable "data_protection_backup_vault" {
+  type    = any
+  default = null
+}
+
+variable "blob_backup_policies" {
+  type    = any
+  default = {}
+}
+
+variable "file_share_backups" {
+  type    = any
+  default = {}
+}
+
+variable "file_share_backup_policies" {
+  type    = any
+  default = {}
+}

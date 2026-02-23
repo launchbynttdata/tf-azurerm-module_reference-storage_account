@@ -94,7 +94,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 - runs `conftests`. `conftests` make sure `policy` checks are successful.
 - runs `terratest`. This is integration test suit.
 - runs `opa` tests
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -104,7 +104,9 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.117.1 |
 
 ## Modules
 
@@ -117,10 +119,16 @@ No providers.
 | <a name="module_monitor_metric_alert"></a> [monitor\_metric\_alert](#module\_monitor\_metric\_alert) | terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm | ~> 2.0 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | terraform.registry.launch.nttdata.com/module_primitive/log_analytics_workspace/azurerm | ~> 1.0 |
 | <a name="module_diagnostic_setting"></a> [diagnostic\_setting](#module\_diagnostic\_setting) | terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm | ~> 3.0 |
+| <a name="module_recovery_services_vault"></a> [recovery\_services\_vault](#module\_recovery\_services\_vault) | terraform.registry.launch.nttdata.com/module_primitive/recovery_services_vault/azurerm | ~> 1.0 |
+| <a name="module_data_protection_backup_vault"></a> [data\_protection\_backup\_vault](#module\_data\_protection\_backup\_vault) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_vault/azurerm | ~> 0.1.1 |
+| <a name="module_data_protection_backup_policy_blob_storage"></a> [data\_protection\_backup\_policy\_blob\_storage](#module\_data\_protection\_backup\_policy\_blob\_storage) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_policy_blob_storage/azurerm | ~> 1.0 |
+| <a name="module_backup_protected_file_share"></a> [backup\_protected\_file\_share](#module\_backup\_protected\_file\_share) | terraform.registry.launch.nttdata.com/module_primitive/backup_protected_file_share/azurerm | ~> 0.2 |
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [azurerm_backup_policy_file_share.file_share_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/backup_policy_file_share) | resource |
 
 ## Inputs
 
@@ -160,6 +168,11 @@ No resources.
 | <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | n/a | <pre>map(object({<br/>    enabled_log = optional(list(object({<br/>      category_group = optional(string, "allLogs")<br/>      category       = optional(string, null)<br/>    })))<br/>    metrics = optional(list(object({<br/>      category = string<br/>      enabled  = optional(bool)<br/>    })))<br/>  }))</pre> | `{}` | no |
 | <a name="input_log_analytics_workspace"></a> [log\_analytics\_workspace](#input\_log\_analytics\_workspace) | n/a | <pre>object({<br/>    sku               = string<br/>    retention_in_days = number<br/>    daily_quota_gb    = number<br/>    identity = optional(object({<br/>      type         = string<br/>      identity_ids = optional(list(string))<br/>    }))<br/>    local_authentication_disabled = optional(bool)<br/>  })</pre> | `null` | no |
 | <a name="input_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#input\_log\_analytics\_workspace\_id) | (Optional) The ID of the Log Analytics Workspace. | `string` | `null` | no |
+| <a name="input_recovery_services_vault"></a> [recovery\_services\_vault](#input\_recovery\_services\_vault) | Recovery Services Vault configuration | <pre>object({<br/>    name                               = optional(string)<br/>    sku                                = optional(string, "Standard")<br/>    public_network_access_enabled      = optional(bool, true)<br/>    immutability                       = optional(string)<br/>    storage_mode_type                  = optional(string, "GeoRedundant")<br/>    cross_region_restore_enabled       = optional(bool, false)<br/>    soft_delete_enabled                = optional(bool, false)<br/>    classic_vmware_replication_enabled = optional(bool)<br/><br/>    identity = optional(object({<br/>      type         = string<br/>      identity_ids = optional(list(string))<br/>    }))<br/><br/>    encryption = optional(object({<br/>      key_id                            = string<br/>      infrastructure_encryption_enabled = bool<br/>      user_assigned_identity_id         = optional(string)<br/>      use_system_assigned_identity      = optional(bool, true)<br/>    }))<br/><br/>    monitoring = optional(map(any))<br/>  })</pre> | `null` | no |
+| <a name="input_data_protection_backup_vault"></a> [data\_protection\_backup\_vault](#input\_data\_protection\_backup\_vault) | Data Protection Backup Vault configuration | <pre>object({<br/>    name                       = optional(string)<br/>    datastore_type             = optional(string, "VaultStore")<br/>    redundancy                 = optional(string, "LocallyRedundant")<br/>    retention_duration_in_days = optional(number, 14)<br/>    soft_delete                = optional(string, "On")<br/><br/>    identity = optional(object({<br/>      type = string<br/>    }))<br/>  })</pre> | `null` | no |
+| <a name="input_blob_backup_policies"></a> [blob\_backup\_policies](#input\_blob\_backup\_policies) | Blob storage backup policies | <pre>map(object({<br/>    policy_name = string<br/><br/>    backup_repeating_time_intervals        = optional(list(string))<br/>    operational_default_retention_duration = optional(string)<br/>    vault_default_retention_duration       = optional(string)<br/>    time_zone                              = optional(string)<br/><br/>    retention_rules = optional(list(object({<br/>      name     = string<br/>      priority = number<br/><br/>      life_cycle = object({<br/>        data_store_type = string<br/>        duration        = string<br/>      })<br/><br/>      criteria = object({<br/>        absolute_criteria      = optional(string)<br/>        days_of_month          = optional(list(number))<br/>        days_of_week           = optional(list(string))<br/>        months_of_year         = optional(list(string))<br/>        scheduled_backup_times = optional(list(string))<br/>        weeks_of_month         = optional(list(string))<br/>      })<br/>    })), [])<br/><br/>    timeouts = optional(object({<br/>      create = optional(string, "30m")<br/>      read   = optional(string, "5m")<br/>      delete = optional(string, "30m")<br/>    }), {})<br/>  }))</pre> | `{}` | no |
+| <a name="input_file_share_backups"></a> [file\_share\_backups](#input\_file\_share\_backups) | n/a | <pre>map(object({<br/>    file_share_name = string<br/>    policy_key      = string<br/>  }))</pre> | n/a | yes |
+| <a name="input_file_share_backup_policies"></a> [file\_share\_backup\_policies](#input\_file\_share\_backup\_policies) | File share backup policy configuration | <pre>map(object({<br/>    name                  = string<br/>    frequency             = string<br/>    time                  = string<br/>    retention_daily_count = number<br/>  }))</pre> | `{}` | no |
 
 ## Outputs
 
@@ -178,4 +191,4 @@ No resources.
 | <a name="output_storage_containers"></a> [storage\_containers](#output\_storage\_containers) | Storage container resource map. |
 | <a name="output_storage_queues"></a> [storage\_queues](#output\_storage\_queues) | Storage queues resource map. |
 | <a name="output_storage_shares"></a> [storage\_shares](#output\_storage\_shares) | Storage share resource map. |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->

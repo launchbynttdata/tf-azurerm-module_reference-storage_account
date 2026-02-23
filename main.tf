@@ -133,3 +133,116 @@ module "diagnostic_setting" {
   metrics                    = each.value.metrics
   depends_on                 = [module.resource_group]
 }
+module "recovery_services_vault" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/recovery_services_vault/azurerm"
+  version = "~> 1.0"
+
+  count = var.recovery_services_vault != null ? 1 : 0
+
+  name                = coalesce(var.recovery_services_vault.name, module.resource_names["recovery_services_vault"].standard)
+  location            = var.location
+  resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+  sku                 = var.recovery_services_vault.sku
+
+  public_network_access_enabled      = var.recovery_services_vault.public_network_access_enabled
+  immutability                       = var.recovery_services_vault.immutability
+  storage_mode_type                  = var.recovery_services_vault.storage_mode_type
+  cross_region_restore_enabled       = var.recovery_services_vault.cross_region_restore_enabled
+  soft_delete_enabled                = var.recovery_services_vault.soft_delete_enabled
+  classic_vmware_replication_enabled = var.recovery_services_vault.classic_vmware_replication_enabled
+
+  identity   = var.recovery_services_vault.identity
+  encryption = var.recovery_services_vault.encryption
+  monitoring = var.recovery_services_vault.monitoring
+
+  tags = merge(local.tags, var.tags)
+
+  depends_on = [
+    module.resource_group,
+    module.storage_account
+  ]
+}
+
+module "data_protection_backup_vault" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_vault/azurerm"
+  version = "~> 0.1.1"
+
+  count = var.data_protection_backup_vault != null ? 1 : 0
+
+  name                = coalesce(var.data_protection_backup_vault.name, module.resource_names["data_protection_backup_vault"].standard)
+  location            = var.location
+  resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+
+  datastore_type = var.data_protection_backup_vault.datastore_type
+  redundancy     = var.data_protection_backup_vault.redundancy
+
+  soft_delete                = var.data_protection_backup_vault.soft_delete
+  retention_duration_in_days = var.data_protection_backup_vault.retention_duration_in_days
+
+  identity = var.data_protection_backup_vault.identity
+
+  tags = merge(local.tags, var.tags)
+
+  depends_on = [
+    module.resource_group,
+    module.storage_account
+  ]
+}
+
+module "data_protection_backup_policy_blob_storage" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_policy_blob_storage/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.blob_backup_policies != null ? var.blob_backup_policies : {}
+
+  policy_name = each.value.policy_name
+  vault_id    = module.data_protection_backup_vault[0].vault_id
+
+  backup_repeating_time_intervals        = each.value.backup_repeating_time_intervals
+  operational_default_retention_duration = each.value.operational_default_retention_duration
+  vault_default_retention_duration       = each.value.vault_default_retention_duration
+  time_zone                              = each.value.time_zone
+
+  retention_rules = each.value.retention_rules
+  timeouts        = each.value.timeouts
+
+  depends_on = [
+    module.data_protection_backup_vault
+  ]
+}
+
+resource "azurerm_backup_policy_file_share" "file_share_policy" {
+  for_each = var.file_share_backup_policies
+
+  name                = each.value.name
+  resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+  recovery_vault_name = module.recovery_services_vault[0].vault_name
+
+  backup {
+    frequency = each.value.frequency
+    time      = each.value.time
+  }
+
+  retention_daily {
+    count = each.value.retention_daily_count
+  }
+}
+module "backup_protected_file_share" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/backup_protected_file_share/azurerm"
+  version = "~> 0.2"
+
+  for_each = var.file_share_backups != null ? var.file_share_backups : {}
+
+  resource_group_name       = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+  recovery_vault_name       = module.recovery_services_vault[0].vault_name
+  source_storage_account_id = module.storage_account.id
+  file_share_name           = each.value.file_share_name
+
+  backup_policy_id = azurerm_backup_policy_file_share.file_share_policy[each.value.policy_key].id
+
+  depends_on = [
+    module.recovery_services_vault,
+    module.storage_account,
+    azurerm_backup_policy_file_share.file_share_policy
+  ]
+}
