@@ -139,7 +139,7 @@ module "recovery_services_vault" {
 
   count = var.recovery_services_vault != null ? 1 : 0
 
-  name                = coalesce(var.recovery_services_vault.name, module.resource_names["recovery_services_vault"].standard)
+  name                = try(var.recovery_services_vault.name, module.resource_names["recovery_services_vault"].standard, null)
   location            = var.location
   resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
   sku                 = var.recovery_services_vault.sku
@@ -167,9 +167,8 @@ module "data_protection_backup_vault" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_vault/azurerm"
   version = "~> 0.1.1"
 
-  count = var.data_protection_backup_vault != null ? 1 : 0
-
-  name                = coalesce(var.data_protection_backup_vault.name, module.resource_names["data_protection_backup_vault"].standard)
+  count               = var.data_protection_backup_vault != null ? 1 : 0
+  name                = try(var.data_protection_backup_vault.name, module.resource_names["data_protection_backup_vault"].standard, null)
   location            = var.location
   resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
 
@@ -188,7 +187,6 @@ module "data_protection_backup_vault" {
     module.storage_account
   ]
 }
-
 module "data_protection_backup_policy_blob_storage" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_policy_blob_storage/azurerm"
   version = "~> 1.0"
