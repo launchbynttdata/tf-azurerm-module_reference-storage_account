@@ -219,3 +219,9 @@ variable "storage_shares" {
   }))
   default = {}
 }
+variable "blob_backup_instances" {
+  type = map(object({
+    policy_key = string
+  }))
+  default = {}
+}

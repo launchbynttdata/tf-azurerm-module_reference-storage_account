@@ -130,6 +130,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 |------|------|
 | [azurerm_backup_container_storage_account.registration](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/backup_container_storage_account) | resource |
 | [azurerm_backup_policy_file_share.file_share_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/backup_policy_file_share) | resource |
+| [azurerm_data_protection_backup_instance_blob_storage.blob_backup](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/data_protection_backup_instance_blob_storage) | resource |
 
 ## Inputs
 
@@ -174,6 +175,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="input_blob_backup_policies"></a> [blob\_backup\_policies](#input\_blob\_backup\_policies) | Blob storage backup policies | <pre>map(object({<br/>    policy_name = string<br/><br/>    backup_repeating_time_intervals        = optional(list(string))<br/>    operational_default_retention_duration = optional(string)<br/>    vault_default_retention_duration       = optional(string)<br/>    time_zone                              = optional(string)<br/><br/>    retention_rules = optional(list(object({<br/>      name     = string<br/>      priority = number<br/><br/>      life_cycle = object({<br/>        data_store_type = string<br/>        duration        = string<br/>      })<br/><br/>      criteria = object({<br/>        absolute_criteria      = optional(string)<br/>        days_of_month          = optional(list(number))<br/>        days_of_week           = optional(list(string))<br/>        months_of_year         = optional(list(string))<br/>        scheduled_backup_times = optional(list(string))<br/>        weeks_of_month         = optional(list(string))<br/>      })<br/>    })), [])<br/><br/>    timeouts = optional(object({<br/>      create = optional(string, "30m")<br/>      read   = optional(string, "5m")<br/>      delete = optional(string, "30m")<br/>    }), {})<br/>  }))</pre> | `{}` | no |
 | <a name="input_file_share_backups"></a> [file\_share\_backups](#input\_file\_share\_backups) | n/a | <pre>map(object({<br/>    file_share_name = string<br/>    policy_key      = string<br/>  }))</pre> | n/a | yes |
 | <a name="input_file_share_backup_policies"></a> [file\_share\_backup\_policies](#input\_file\_share\_backup\_policies) | File share backup policy configuration | <pre>map(object({<br/>    name                  = string<br/>    frequency             = string<br/>    time                  = string<br/>    retention_daily_count = number<br/>  }))</pre> | `{}` | no |
+| <a name="input_blob_backup_instances"></a> [blob\_backup\_instances](#input\_blob\_backup\_instances) | Blob backup instances | <pre>map(object({<br/>    policy_key = string<br/>  }))</pre> | `{}` | no |
 
 ## Outputs
 

@@ -76,3 +76,8 @@ storage_shares = {
     quota = 100
   }
 }
+blob_backup_instances = {
+  default = {
+    policy_key = "blob_policy1"
+  }
+}

@@ -255,3 +255,14 @@ module "backup_protected_file_share" {
     module.storage_account
   ]
 }
+
+resource "azurerm_data_protection_backup_instance_blob_storage" "blob_backup" {
+  for_each = var.blob_backup_instances
+
+  name               = each.key
+  vault_id           = module.data_protection_backup_vault[0].vault_id
+  location           = var.location
+  storage_account_id = module.storage_account.id
+
+  backup_policy_id = module.data_protection_backup_policy_blob_storage[each.value.policy_key].id
+}

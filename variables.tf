@@ -484,3 +484,10 @@ variable "file_share_backup_policies" {
 
   default = {}
 }
+variable "blob_backup_instances" {
+  description = "Blob backup instances"
+  type = map(object({
+    policy_key = string
+  }))
+  default = {}
+}

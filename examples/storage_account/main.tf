@@ -56,6 +56,7 @@ module "storage_account" {
   blob_backup_policies         = var.blob_backup_policies
   file_share_backups           = var.file_share_backups
   storage_shares               = var.storage_shares
+  blob_backup_instances        = var.blob_backup_instances
 
   action_group = coalesce({
     name       = "example-action-group"
