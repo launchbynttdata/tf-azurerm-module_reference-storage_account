@@ -26,6 +26,7 @@ resource_names_map = {
   }
 }
 recovery_services_vault = {
+  name                = "example-rsv"
   sku                 = "Standard"
   soft_delete_enabled = true
 
@@ -35,6 +36,7 @@ recovery_services_vault = {
 }
 
 data_protection_backup_vault = {
+  name           = "example-dpv"
   datastore_type = "VaultStore"
 
   identity = {
@@ -66,5 +68,11 @@ file_share_backups = {
   share1 = {
     file_share_name = "share1"
     policy_key      = "daily"
+  }
+}
+storage_shares = {
+  share1 = {
+    name  = "share1"
+    quota = 100
   }
 }

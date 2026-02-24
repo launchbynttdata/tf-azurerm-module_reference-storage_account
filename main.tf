@@ -162,6 +162,18 @@ module "recovery_services_vault" {
     module.storage_account
   ]
 }
+resource "azurerm_backup_container_storage_account" "registration" {
+  resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+
+  recovery_vault_name = module.recovery_services_vault[0].vault_name
+
+  storage_account_id = module.storage_account.id
+
+  depends_on = [
+    module.recovery_services_vault,
+    module.storage_account
+  ]
+}
 
 module "data_protection_backup_vault" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_vault/azurerm"
@@ -239,8 +251,7 @@ module "backup_protected_file_share" {
   backup_policy_id = azurerm_backup_policy_file_share.file_share_policy[each.value.policy_key].id
 
   depends_on = [
-    module.recovery_services_vault,
-    module.storage_account,
-    azurerm_backup_policy_file_share.file_share_policy
+    azurerm_backup_container_storage_account.registration,
+    module.storage_account
   ]
 }

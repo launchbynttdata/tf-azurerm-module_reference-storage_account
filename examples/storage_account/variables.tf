@@ -210,3 +210,12 @@ variable "file_share_backup_policies" {
   type    = any
   default = {}
 }
+
+variable "storage_shares" {
+  description = "map of storage file shares configs, keyed polymorphically"
+  type = map(object({
+    name  = string
+    quota = number
+  }))
+  default = {}
+}

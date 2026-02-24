@@ -46,6 +46,7 @@ No resources.
 | <a name="input_blob_backup_policies"></a> [blob\_backup\_policies](#input\_blob\_backup\_policies) | n/a | `any` | `{}` | no |
 | <a name="input_file_share_backups"></a> [file\_share\_backups](#input\_file\_share\_backups) | n/a | `any` | `{}` | no |
 | <a name="input_file_share_backup_policies"></a> [file\_share\_backup\_policies](#input\_file\_share\_backup\_policies) | n/a | `any` | `{}` | no |
+| <a name="input_storage_shares"></a> [storage\_shares](#input\_storage\_shares) | map of storage file shares configs, keyed polymorphically | <pre>map(object({<br/>    name  = string<br/>    quota = number<br/>  }))</pre> | `{}` | no |
 
 ## Outputs
 

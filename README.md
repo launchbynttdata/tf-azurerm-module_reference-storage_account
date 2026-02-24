@@ -128,6 +128,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 | Name | Type |
 |------|------|
+| [azurerm_backup_container_storage_account.registration](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/backup_container_storage_account) | resource |
 | [azurerm_backup_policy_file_share.file_share_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/backup_policy_file_share) | resource |
 
 ## Inputs
