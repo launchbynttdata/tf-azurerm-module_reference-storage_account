@@ -28,7 +28,7 @@ resource_names_map = {
 recovery_services_vault = {
   name                = "example-rsv"
   sku                 = "Standard"
-  soft_delete_enabled = true
+  soft_delete_enabled = false
 
   identity = {
     type = "SystemAssigned"

@@ -122,6 +122,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="module_recovery_services_vault"></a> [recovery\_services\_vault](#module\_recovery\_services\_vault) | terraform.registry.launch.nttdata.com/module_primitive/recovery_services_vault/azurerm | ~> 1.0 |
 | <a name="module_data_protection_backup_vault"></a> [data\_protection\_backup\_vault](#module\_data\_protection\_backup\_vault) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_vault/azurerm | ~> 0.1.1 |
 | <a name="module_data_protection_backup_policy_blob_storage"></a> [data\_protection\_backup\_policy\_blob\_storage](#module\_data\_protection\_backup\_policy\_blob\_storage) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_policy_blob_storage/azurerm | ~> 1.0 |
+| <a name="module_backup_policy_file_share"></a> [backup\_policy\_file\_share](#module\_backup\_policy\_file\_share) | terraform.registry.launch.nttdata.com/module_primitive/backup_policy_file_share/azurerm | ~> 1.0.0 |
 | <a name="module_backup_protected_file_share"></a> [backup\_protected\_file\_share](#module\_backup\_protected\_file\_share) | terraform.registry.launch.nttdata.com/module_primitive/backup_protected_file_share/azurerm | ~> 0.2 |
 
 ## Resources
@@ -129,7 +130,6 @@ If `make check` target is successful, developer is good to commit the code to pr
 | Name | Type |
 |------|------|
 | [azurerm_backup_container_storage_account.registration](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/backup_container_storage_account) | resource |
-| [azurerm_backup_policy_file_share.file_share_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/backup_policy_file_share) | resource |
 | [azurerm_data_protection_backup_instance_blob_storage.blob_backup](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/data_protection_backup_instance_blob_storage) | resource |
 
 ## Inputs

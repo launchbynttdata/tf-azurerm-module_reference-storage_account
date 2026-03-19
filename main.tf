@@ -208,34 +208,41 @@ module "data_protection_backup_policy_blob_storage" {
   policy_name = each.value.policy_name
   vault_id    = module.data_protection_backup_vault[0].vault_id
 
-  backup_repeating_time_intervals        = each.value.backup_repeating_time_intervals
-  operational_default_retention_duration = each.value.operational_default_retention_duration
-  vault_default_retention_duration       = each.value.vault_default_retention_duration
-  time_zone                              = each.value.time_zone
+  backup_repeating_time_intervals        = try(each.value.backup_repeating_time_intervals, null)
+  operational_default_retention_duration = try(each.value.operational_default_retention_duration, null)
+  vault_default_retention_duration       = try(each.value.vault_default_retention_duration, null)
+  time_zone                              = try(each.value.time_zone, null)
 
-  retention_rules = each.value.retention_rules
-  timeouts        = each.value.timeouts
+  retention_rules = try(each.value.retention_rules, [])
+  timeouts        = try(each.value.timeouts, {})
 
   depends_on = [
     module.data_protection_backup_vault
   ]
 }
 
-resource "azurerm_backup_policy_file_share" "file_share_policy" {
+module "backup_policy_file_share" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/backup_policy_file_share/azurerm"
+  version = "~> 1.0.0"
+
   for_each = var.file_share_backup_policies
 
   name                = each.value.name
   resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
   recovery_vault_name = module.recovery_services_vault[0].vault_name
 
-  backup {
+  backup = {
     frequency = each.value.frequency
     time      = each.value.time
   }
 
-  retention_daily {
+  retention_daily = {
     count = each.value.retention_daily_count
   }
+
+  depends_on = [
+    module.recovery_services_vault
+  ]
 }
 module "backup_protected_file_share" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/backup_protected_file_share/azurerm"
@@ -248,11 +255,12 @@ module "backup_protected_file_share" {
   source_storage_account_id = module.storage_account.id
   file_share_name           = each.value.file_share_name
 
-  backup_policy_id = azurerm_backup_policy_file_share.file_share_policy[each.value.policy_key].id
+  backup_policy_id = module.backup_policy_file_share[each.value.policy_key].backup_policy_file_share_id
 
   depends_on = [
     azurerm_backup_container_storage_account.registration,
-    module.storage_account
+    module.storage_account,
+    module.backup_policy_file_share
   ]
 }
 
