@@ -386,7 +386,7 @@ variable "recovery_services_vault" {
     immutability                       = optional(string)
     storage_mode_type                  = optional(string, "GeoRedundant")
     cross_region_restore_enabled       = optional(bool, false)
-    soft_delete_enabled                = optional(bool, false)
+    soft_delete_enabled                = optional(bool, true)
     classic_vmware_replication_enabled = optional(bool)
 
     identity = optional(object({
