@@ -163,6 +163,8 @@ module "recovery_services_vault" {
   ]
 }
 resource "azurerm_backup_container_storage_account" "registration" {
+  count = var.recovery_services_vault != null && var.file_share_backups != null && length(var.file_share_backups) > 0 ? 1 : 0
+
   resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
 
   recovery_vault_name = module.recovery_services_vault[0].vault_name
@@ -203,7 +205,7 @@ module "data_protection_backup_policy_blob_storage" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_policy_blob_storage/azurerm"
   version = "~> 1.0"
 
-  for_each = var.blob_backup_policies != null ? var.blob_backup_policies : {}
+  for_each = var.data_protection_backup_vault != null && var.blob_backup_policies != null ? var.blob_backup_policies : {}
 
   policy_name = each.value.policy_name
   vault_id    = module.data_protection_backup_vault[0].vault_id
@@ -225,7 +227,7 @@ module "backup_policy_file_share" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/backup_policy_file_share/azurerm"
   version = "~> 1.0.0"
 
-  for_each = var.file_share_backup_policies
+  for_each = var.recovery_services_vault != null ? var.file_share_backup_policies : {}
 
   name                = each.value.name
   resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
@@ -248,7 +250,7 @@ module "backup_protected_file_share" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/backup_protected_file_share/azurerm"
   version = "~> 0.2"
 
-  for_each = var.file_share_backups != null ? var.file_share_backups : {}
+  for_each = var.recovery_services_vault != null && var.file_share_backups != null ? var.file_share_backups : {}
 
   resource_group_name       = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
   recovery_vault_name       = module.recovery_services_vault[0].vault_name
@@ -265,7 +267,7 @@ module "backup_protected_file_share" {
 }
 
 resource "azurerm_data_protection_backup_instance_blob_storage" "blob_backup" {
-  for_each = var.blob_backup_instances
+  for_each = var.data_protection_backup_vault != null && var.blob_backup_instances != null ? var.blob_backup_instances : {}
 
   name               = each.key
   vault_id           = module.data_protection_backup_vault[0].vault_id
