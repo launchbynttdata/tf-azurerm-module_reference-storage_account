@@ -108,9 +108,9 @@ If `make check` target is successful, developer is good to commit the code to pr
 
 | Name | Version |
 |------|---------|
-| <a name="provider_time"></a> [time](#provider\_time) | 0.13.1 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.117.1 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.8.1 |
+| <a name="provider_time"></a> [time](#provider\_time) | 0.13.1 |
 
 ## Modules
 
@@ -131,7 +131,7 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="module_backup_blob_data_contributor"></a> [backup\_blob\_data\_contributor](#module\_backup\_blob\_data\_contributor) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.2.1 |
 | <a name="module_backup_policy_file_share"></a> [backup\_policy\_file\_share](#module\_backup\_policy\_file\_share) | terraform.registry.launch.nttdata.com/module_primitive/backup_policy_file_share/azurerm | ~> 1.0.1 |
 | <a name="module_backup_protected_file_share"></a> [backup\_protected\_file\_share](#module\_backup\_protected\_file\_share) | terraform.registry.launch.nttdata.com/module_primitive/backup_protected_file_share/azurerm | ~> 0.1.3 |
-| <a name="module_backup_instance_blob_storage"></a> [backup\_instance\_blob\_storage](#module\_backup\_instance\_blob\_storage) | ../tf-azurerm-module_primitive-data_protection_backup_instance_blob_storage | n/a |
+| <a name="module_backup_instance_blob_storage"></a> [backup\_instance\_blob\_storage](#module\_backup\_instance\_blob\_storage) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_instance_blob_storage/azurerm | ~> 1.0.0 |
 
 ## Resources
 

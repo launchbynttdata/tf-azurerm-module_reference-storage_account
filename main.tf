@@ -368,9 +368,9 @@ module "backup_protected_file_share" {
 }
 
 module "backup_instance_blob_storage" {
-  source = "../tf-azurerm-module_primitive-data_protection_backup_instance_blob_storage"
-  # source  = "terraform.registry.launch.nttdata.com/module_primitive/backup_instance_blob_storage/azurerm"
-  # version = "~> 1.0.0"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_instance_blob_storage/azurerm"
+  version = "~> 1.0.0"
+
   for_each = var.data_protection_backup_vault != null && var.blob_backup_instances != null ? var.blob_backup_instances : {}
 
   name                            = each.key
