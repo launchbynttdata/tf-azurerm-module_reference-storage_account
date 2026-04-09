@@ -16,6 +16,12 @@ variable "resource_group_name" {
   type        = string
 }
 
+variable "create_resource_group" {
+  description = "Optional override for creating resource group in this module. When null, behavior follows resource_group_name nullability."
+  type        = bool
+  default     = null
+}
+
 variable "location" {
   type        = string
   description = "(Required) Specifies the supported Azure location where the resource exists."
@@ -231,6 +237,12 @@ variable "blob_change_feed_enabled" {
   description = "Is the blob service properties for change feed enabled for blob"
   type        = bool
   default     = false
+}
+
+variable "blob_change_feed_retention_in_days" {
+  description = "Number of days to retain blob change feed. Set 0 to disable"
+  type        = number
+  default     = 0
 }
 
 variable "blob_last_access_time_enabled" {
@@ -487,7 +499,14 @@ variable "file_share_backup_policies" {
 variable "blob_backup_instances" {
   description = "Blob backup instances"
   type = map(object({
-    policy_key = string
+    policy_key                      = string
+    storage_account_container_names = optional(list(string))
+    timeouts = optional(object({
+      create = optional(string, "30m")
+      read   = optional(string, "5m")
+      update = optional(string, "30m")
+      delete = optional(string, "30m")
+    }), {})
   }))
   default = {}
 }

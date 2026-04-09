@@ -76,5 +76,18 @@ output "storage_queues" {
 
 output "storage_shares" {
   description = "Storage share resource map."
-  value       = try(module.storage_account.storage_shares, null)
+  value = try({
+    for key, share in module.storage_account.storage_shares : key => {
+      access_tier          = try(share.access_tier, null)
+      acl                  = try(share.acl, [])
+      enabled_protocol     = try(share.enabled_protocol, null)
+      id                   = share.id
+      name                 = share.name
+      quota                = share.quota
+      resource_manager_id  = try(share.resource_manager_id, null)
+      storage_account_name = try(share.storage_account_name, null)
+      timeouts             = try(share.timeouts, null)
+      url                  = try(share.url, null)
+    }
+  }, null)
 }
