@@ -160,8 +160,9 @@ variable "storage_containers" {
 variable "storage_shares" {
   description = "map of storage file shares configs, keyed polymorphically"
   type = map(object({
-    name  = string
-    quota = number
+    name     = string
+    quota    = number
+    metadata = optional(map(string))
   }))
   default = {}
 }
@@ -482,6 +483,7 @@ variable "file_share_backups" {
     file_share_name = string
     policy_key      = string
   }))
+  default = {}
 }
 
 variable "file_share_backup_policies" {

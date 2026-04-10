@@ -49,7 +49,7 @@ No resources.
 | <a name="input_blob_backup_policies"></a> [blob\_backup\_policies](#input\_blob\_backup\_policies) | n/a | `any` | `{}` | no |
 | <a name="input_file_share_backups"></a> [file\_share\_backups](#input\_file\_share\_backups) | n/a | `any` | `{}` | no |
 | <a name="input_file_share_backup_policies"></a> [file\_share\_backup\_policies](#input\_file\_share\_backup\_policies) | n/a | `any` | `{}` | no |
-| <a name="input_storage_shares"></a> [storage\_shares](#input\_storage\_shares) | map of storage file shares configs, keyed polymorphically | <pre>map(object({<br/>    name  = string<br/>    quota = number<br/>  }))</pre> | `{}` | no |
+| <a name="input_storage_shares"></a> [storage\_shares](#input\_storage\_shares) | map of storage file shares configs, keyed polymorphically | <pre>map(object({<br/>    name     = string<br/>    quota    = number<br/>    metadata = optional(map(string))<br/>  }))</pre> | `{}` | no |
 | <a name="input_blob_backup_instances"></a> [blob\_backup\_instances](#input\_blob\_backup\_instances) | n/a | <pre>map(object({<br/>    policy_key                      = string<br/>    storage_account_container_names = optional(list(string))<br/>    timeouts = optional(object({<br/>      create = optional(string, "30m")<br/>      read   = optional(string, "5m")<br/>      update = optional(string, "30m")<br/>      delete = optional(string, "30m")<br/>    }), {})<br/>  }))</pre> | `{}` | no |
 
 ## Outputs

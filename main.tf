@@ -262,7 +262,7 @@ module "backup_storage_reader" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.2.1"
 
-  count = var.data_protection_backup_vault != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
+  count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
 
   name                 = random_uuid.backup_storage_reader[0].result
   scope                = module.storage_account.id
@@ -280,7 +280,7 @@ module "backup_storage_backup_contributor" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.2.1"
 
-  count = var.data_protection_backup_vault != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
+  count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
 
   name                 = random_uuid.backup_storage_backup_contributor[0].result
   scope                = module.storage_account.id
@@ -298,7 +298,7 @@ module "backup_blob_data_contributor" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.2.1"
 
-  count = var.data_protection_backup_vault != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
+  count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
 
   name                 = random_uuid.backup_blob_data_contributor[0].result
   scope                = module.storage_account.id
