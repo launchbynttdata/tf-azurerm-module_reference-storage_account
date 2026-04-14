@@ -93,6 +93,24 @@ variable "storage_containers" {
   default = {}
 }
 
+variable "blob_versioning_enabled" {
+  description = "Enable blob versioning for backup compatibility"
+  type        = bool
+  default     = false
+}
+
+variable "blob_change_feed_enabled" {
+  description = "Enable blob change feed for backup compatibility"
+  type        = bool
+  default     = false
+}
+
+variable "blob_change_feed_retention_in_days" {
+  description = "Number of days to retain blob change feed. Set 0 to disable"
+  type        = number
+  default     = 0
+}
+
 # Monitor Action Group Properties
 variable "action_group" {
   description = <<EOT
@@ -184,4 +202,52 @@ variable "log_analytics_workspace" {
     local_authentication_disabled = optional(bool)
   })
   default = null
+}
+
+variable "recovery_services_vault" {
+  type    = any
+  default = null
+}
+
+variable "data_protection_backup_vault" {
+  type    = any
+  default = null
+}
+
+variable "blob_backup_policies" {
+  type    = any
+  default = {}
+}
+
+variable "file_share_backups" {
+  type    = any
+  default = {}
+}
+
+variable "file_share_backup_policies" {
+  type    = any
+  default = {}
+}
+
+variable "storage_shares" {
+  description = "map of storage file shares configs, keyed polymorphically"
+  type = map(object({
+    name     = string
+    quota    = number
+    metadata = optional(map(string))
+  }))
+  default = {}
+}
+variable "blob_backup_instances" {
+  type = map(object({
+    policy_key                      = string
+    storage_account_container_names = optional(list(string))
+    timeouts = optional(object({
+      create = optional(string, "30m")
+      read   = optional(string, "5m")
+      update = optional(string, "30m")
+      delete = optional(string, "30m")
+    }), {})
+  }))
+  default = {}
 }

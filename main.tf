@@ -31,7 +31,7 @@ module "resource_group" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm"
   version = "~> 1.1"
 
-  count    = var.resource_group_name == null ? 1 : 0
+  count    = var.create_resource_group != null ? (var.create_resource_group ? 1 : 0) : (var.resource_group_name == null ? 1 : 0)
   name     = module.resource_names["resource_group"].standard
   location = var.location
 
@@ -40,7 +40,7 @@ module "resource_group" {
 
 module "storage_account" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/storage_account/azurerm"
-  version = "~> 1.0"
+  version = "~> 1.3.4"
 
   resource_group_name  = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
   location             = var.location
@@ -60,6 +60,7 @@ module "storage_account" {
   blob_delete_retention_policy           = var.blob_delete_retention_policy
   blob_versioning_enabled                = var.blob_versioning_enabled
   blob_change_feed_enabled               = var.blob_change_feed_enabled
+  blob_change_feed_retention_in_days     = var.blob_change_feed_retention_in_days
   blob_last_access_time_enabled          = var.blob_last_access_time_enabled
   blob_container_delete_retention_policy = var.blob_container_delete_retention_policy
   public_network_access_enabled          = var.public_network_access_enabled
@@ -71,7 +72,7 @@ module "storage_account" {
 # metric alerts
 module "monitor_action_group" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm"
-  version = "~> 1.0.0"
+  version = "~> 1.0.1"
 
   count               = var.action_group != null ? 1 : 0
   action_group_name   = var.action_group.name
@@ -81,6 +82,16 @@ module "monitor_action_group" {
   email_receivers     = var.action_group.email_receivers
   tags                = var.tags
   depends_on          = [module.resource_group]
+}
+
+resource "time_sleep" "wait_for_storage_monitoring" {
+  count = length(var.metric_alerts) > 0 ? 1 : 0
+
+  depends_on = [
+    module.storage_account
+  ]
+
+  create_duration = "120s"
 }
 
 module "monitor_metric_alert" {
@@ -100,13 +111,17 @@ module "monitor_metric_alert" {
   criteria            = each.value.criteria
   dynamic_criteria    = each.value.dynamic_criteria
 
-  depends_on = [module.resource_group]
+  depends_on = [
+    module.resource_group,
+    module.storage_account,
+    time_sleep.wait_for_storage_monitoring
+  ]
 }
 
 # diagnostic settings
 module "log_analytics_workspace" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/log_analytics_workspace/azurerm"
-  version = "~> 1.0"
+  version = "~> 1.2.5"
 
   count                         = var.log_analytics_workspace != null ? 1 : 0
   name                          = module.resource_names["log_analytics_workspace"].standard
@@ -123,7 +138,7 @@ module "log_analytics_workspace" {
 
 module "diagnostic_setting" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm"
-  version = "~> 3.0"
+  version = "~> 3.1.2"
 
   for_each                   = var.diagnostic_settings
   name                       = each.key
@@ -132,4 +147,230 @@ module "diagnostic_setting" {
   enabled_log                = each.value.enabled_log
   metrics                    = each.value.metrics
   depends_on                 = [module.resource_group]
+}
+module "recovery_services_vault" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/recovery_services_vault/azurerm"
+  version = "~> 1.0.2"
+
+  count = var.recovery_services_vault != null ? 1 : 0
+
+  name = coalesce(
+    try(var.recovery_services_vault.name, null),
+    try(module.resource_names["recovery_services_vault"].standard, null),
+    "${module.resource_names["resource_group"].standard}-rsv"
+  )
+  location            = var.location
+  resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+  sku                 = var.recovery_services_vault.sku
+
+  public_network_access_enabled      = var.recovery_services_vault.public_network_access_enabled
+  immutability                       = var.recovery_services_vault.immutability
+  storage_mode_type                  = var.recovery_services_vault.storage_mode_type
+  cross_region_restore_enabled       = var.recovery_services_vault.cross_region_restore_enabled
+  soft_delete_enabled                = var.recovery_services_vault.soft_delete_enabled
+  classic_vmware_replication_enabled = var.recovery_services_vault.classic_vmware_replication_enabled
+
+  identity   = var.recovery_services_vault.identity
+  encryption = var.recovery_services_vault.encryption
+  monitoring = var.recovery_services_vault.monitoring
+
+  tags = merge(local.tags, var.tags)
+
+  depends_on = [
+    module.resource_group,
+    module.storage_account
+  ]
+}
+resource "azurerm_backup_container_storage_account" "registration" {
+  count = var.recovery_services_vault != null && var.file_share_backups != null && length(var.file_share_backups) > 0 ? 1 : 0
+
+  resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+
+  recovery_vault_name = module.recovery_services_vault[0].vault_name
+
+  storage_account_id = module.storage_account.id
+
+  depends_on = [
+    module.recovery_services_vault,
+    module.storage_account
+  ]
+}
+
+module "data_protection_backup_vault" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_vault/azurerm"
+  version = "~> 0.1.3"
+
+  count = var.data_protection_backup_vault != null ? 1 : 0
+  name = coalesce(
+    try(var.data_protection_backup_vault.name, null),
+    try(module.resource_names["data_protection_backup_vault"].standard, null),
+    "${module.resource_names["resource_group"].standard}-dpbv"
+  )
+  location            = var.location
+  resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+
+  datastore_type = var.data_protection_backup_vault.datastore_type
+  redundancy     = var.data_protection_backup_vault.redundancy
+
+  soft_delete                = var.data_protection_backup_vault.soft_delete
+  retention_duration_in_days = var.data_protection_backup_vault.retention_duration_in_days
+
+  identity = var.data_protection_backup_vault.identity
+
+  tags = merge(local.tags, var.tags)
+
+  depends_on = [
+    module.resource_group,
+    module.storage_account
+  ]
+}
+module "data_protection_backup_policy_blob_storage" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_policy_blob_storage/azurerm"
+  version = "~> 1.0.2"
+
+  for_each = var.data_protection_backup_vault != null && var.blob_backup_policies != null ? var.blob_backup_policies : {}
+
+  policy_name = each.value.policy_name
+  vault_id    = module.data_protection_backup_vault[0].vault_id
+
+  backup_repeating_time_intervals        = try(each.value.backup_repeating_time_intervals, null)
+  operational_default_retention_duration = try(each.value.operational_default_retention_duration, null)
+  vault_default_retention_duration       = try(each.value.vault_default_retention_duration, null)
+  time_zone                              = try(each.value.time_zone, null)
+
+  retention_rules = try(each.value.retention_rules, [])
+  timeouts        = try(each.value.timeouts, {})
+
+  depends_on = [
+    module.data_protection_backup_vault
+  ]
+}
+
+module "backup_storage_reader" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.2.1"
+
+  count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
+
+  scope                = module.storage_account.id
+  role_definition_name = "Reader"
+  principal_id         = module.data_protection_backup_vault[0].identity[0].principal_id
+  principal_type       = "ServicePrincipal"
+
+  depends_on = [
+    module.storage_account,
+    module.data_protection_backup_vault
+  ]
+}
+
+module "backup_storage_backup_contributor" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.2.1"
+
+  count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
+
+  scope                = module.storage_account.id
+  role_definition_name = "Storage Account Backup Contributor"
+  principal_id         = module.data_protection_backup_vault[0].identity[0].principal_id
+  principal_type       = "ServicePrincipal"
+
+  depends_on = [
+    module.storage_account,
+    module.data_protection_backup_vault
+  ]
+}
+
+module "backup_blob_data_contributor" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
+  version = "~> 1.2.1"
+
+  count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
+
+  scope                = module.storage_account.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = module.data_protection_backup_vault[0].identity[0].principal_id
+  principal_type       = "ServicePrincipal"
+
+  depends_on = [
+    module.storage_account,
+    module.data_protection_backup_vault
+  ]
+}
+
+# Azure RBAC role assignments require time to propagate.
+# Without this delay, backup instance creation fail with permission errors.
+resource "time_sleep" "wait_for_backup_rbac" {
+  count = var.data_protection_backup_vault != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
+
+  depends_on = [
+    module.backup_storage_reader,
+    module.backup_storage_backup_contributor,
+    module.backup_blob_data_contributor
+  ]
+
+  create_duration = "300s"
+}
+
+module "backup_policy_file_share" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/backup_policy_file_share/azurerm"
+  version = "~> 1.0.1"
+
+  for_each = var.recovery_services_vault != null ? var.file_share_backup_policies : {}
+
+  name                = each.value.name
+  resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+  recovery_vault_name = module.recovery_services_vault[0].vault_name
+
+  backup = {
+    frequency = each.value.frequency
+    time      = each.value.time
+  }
+
+  retention_daily = {
+    count = each.value.retention_daily_count
+  }
+
+  depends_on = [
+    module.recovery_services_vault
+  ]
+}
+module "backup_protected_file_share" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/backup_protected_file_share/azurerm"
+  version = "~> 0.1.3"
+
+  for_each = var.recovery_services_vault != null && var.file_share_backups != null ? var.file_share_backups : {}
+
+  resource_group_name       = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
+  recovery_vault_name       = module.recovery_services_vault[0].vault_name
+  source_storage_account_id = module.storage_account.id
+  file_share_name           = each.value.file_share_name
+
+  backup_policy_id = module.backup_policy_file_share[each.value.policy_key].backup_policy_file_share_id
+
+  depends_on = [
+    azurerm_backup_container_storage_account.registration,
+    module.storage_account,
+    module.backup_policy_file_share
+  ]
+}
+
+module "backup_instance_blob_storage" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_instance_blob_storage/azurerm"
+  version = "~> 1.0.0"
+
+  for_each = var.data_protection_backup_vault != null && var.blob_backup_instances != null ? var.blob_backup_instances : {}
+
+  name                            = each.key
+  vault_id                        = module.data_protection_backup_vault[0].vault_id
+  location                        = var.location
+  storage_account_id              = module.storage_account.id
+  storage_account_container_names = try(each.value.storage_account_container_names, null)
+  timeouts                        = try(each.value.timeouts, {})
+
+  backup_policy_id = module.data_protection_backup_policy_blob_storage[each.value.policy_key].id
+
+  depends_on = [
+    module.data_protection_backup_policy_blob_storage,
+    time_sleep.wait_for_backup_rbac
+  ]
 }

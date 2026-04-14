@@ -38,15 +38,29 @@ module "resource_group" {
 module "storage_account" {
   source = "../.."
 
-  resource_group_name  = local.resource_group_name
-  location             = var.location
-  storage_account_name = coalesce(var.storage_account_name, local.storage_account_name)
+  resource_names_map         = var.resource_names_map
+  resource_group_name        = local.resource_group_name
+  create_resource_group      = false
+  location                   = var.location
+  storage_account_name       = coalesce(var.storage_account_name, local.storage_account_name)
+  file_share_backup_policies = var.file_share_backup_policies
+
   storage_containers = merge(var.storage_containers, {
     storage_container_1 = {
       name                  = "container1"
       container_access_type = "private"
     }
   })
+
+  recovery_services_vault            = var.recovery_services_vault
+  data_protection_backup_vault       = var.data_protection_backup_vault
+  blob_backup_policies               = var.blob_backup_policies
+  blob_versioning_enabled            = var.blob_versioning_enabled
+  blob_change_feed_enabled           = var.blob_change_feed_enabled
+  blob_change_feed_retention_in_days = var.blob_change_feed_retention_in_days
+  file_share_backups                 = var.file_share_backups
+  storage_shares                     = var.storage_shares
+  blob_backup_instances              = var.blob_backup_instances
 
   action_group = coalesce({
     name       = "example-action-group"
@@ -93,18 +107,6 @@ module "storage_account" {
         aggregation       = "Average"
         operator          = "GreaterThan"
         alert_sensitivity = "Medium"
-        # dimensions = [
-        #   {
-        #     name     = "ApiName"
-        #     operator = "Include"
-        #     values   = ["*"]  // Monitor all API operations
-        #   },
-        #   {
-        #     name     = "GeoType"
-        #     operator = "Include"
-        #     values   = ["Primary"]  // Monitor primary storage only
-        #   }
-        # ]
       }
     },
     storage_transactions = {
@@ -135,18 +137,9 @@ module "storage_account" {
     local_authentication_disabled = false
   }, var.log_analytics_workspace)
 
-  diagnostic_settings = merge(var.diagnostic_settings, {
-    transactions = {
-      metrics = [{
-        category = "Transaction"
-        enabled  = true
-        },
-        {
-          category = "Capacity"
-          enabled  = true
-      }]
-    }
-  })
+  # Diagnostic settings disabled for backup testing to avoid Azure scope locks
+  # that prevent resource deletion. Enable by setting var.diagnostic_settings
+  diagnostic_settings = var.diagnostic_settings
 
   depends_on = [module.resource_group]
 }

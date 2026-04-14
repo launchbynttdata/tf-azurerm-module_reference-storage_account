@@ -94,17 +94,22 @@ If `make check` target is successful, developer is good to commit the code to pr
 - runs `conftests`. `conftests` make sure `policy` checks are successful.
 - runs `terratest`. This is integration test suit.
 - runs `opa` tests
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.5 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 3.77 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.6 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | ~> 0.11 |
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_time"></a> [time](#provider\_time) | 0.13.1 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.117.1 |
 
 ## Modules
 
@@ -112,21 +117,35 @@ No providers.
 |------|--------|---------|
 | <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | terraform.registry.launch.nttdata.com/module_library/resource_name/launch | ~> 2.0 |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm | ~> 1.1 |
-| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | terraform.registry.launch.nttdata.com/module_primitive/storage_account/azurerm | ~> 1.0 |
-| <a name="module_monitor_action_group"></a> [monitor\_action\_group](#module\_monitor\_action\_group) | terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm | ~> 1.0.0 |
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | terraform.registry.launch.nttdata.com/module_primitive/storage_account/azurerm | ~> 1.3.4 |
+| <a name="module_monitor_action_group"></a> [monitor\_action\_group](#module\_monitor\_action\_group) | terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm | ~> 1.0.1 |
 | <a name="module_monitor_metric_alert"></a> [monitor\_metric\_alert](#module\_monitor\_metric\_alert) | terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm | ~> 2.0 |
-| <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | terraform.registry.launch.nttdata.com/module_primitive/log_analytics_workspace/azurerm | ~> 1.0 |
-| <a name="module_diagnostic_setting"></a> [diagnostic\_setting](#module\_diagnostic\_setting) | terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm | ~> 3.0 |
+| <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | terraform.registry.launch.nttdata.com/module_primitive/log_analytics_workspace/azurerm | ~> 1.2.5 |
+| <a name="module_diagnostic_setting"></a> [diagnostic\_setting](#module\_diagnostic\_setting) | terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm | ~> 3.1.2 |
+| <a name="module_recovery_services_vault"></a> [recovery\_services\_vault](#module\_recovery\_services\_vault) | terraform.registry.launch.nttdata.com/module_primitive/recovery_services_vault/azurerm | ~> 1.0.2 |
+| <a name="module_data_protection_backup_vault"></a> [data\_protection\_backup\_vault](#module\_data\_protection\_backup\_vault) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_vault/azurerm | ~> 0.1.3 |
+| <a name="module_data_protection_backup_policy_blob_storage"></a> [data\_protection\_backup\_policy\_blob\_storage](#module\_data\_protection\_backup\_policy\_blob\_storage) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_policy_blob_storage/azurerm | ~> 1.0.2 |
+| <a name="module_backup_storage_reader"></a> [backup\_storage\_reader](#module\_backup\_storage\_reader) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.2.1 |
+| <a name="module_backup_storage_backup_contributor"></a> [backup\_storage\_backup\_contributor](#module\_backup\_storage\_backup\_contributor) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.2.1 |
+| <a name="module_backup_blob_data_contributor"></a> [backup\_blob\_data\_contributor](#module\_backup\_blob\_data\_contributor) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.2.1 |
+| <a name="module_backup_policy_file_share"></a> [backup\_policy\_file\_share](#module\_backup\_policy\_file\_share) | terraform.registry.launch.nttdata.com/module_primitive/backup_policy_file_share/azurerm | ~> 1.0.1 |
+| <a name="module_backup_protected_file_share"></a> [backup\_protected\_file\_share](#module\_backup\_protected\_file\_share) | terraform.registry.launch.nttdata.com/module_primitive/backup_protected_file_share/azurerm | ~> 0.1.3 |
+| <a name="module_backup_instance_blob_storage"></a> [backup\_instance\_blob\_storage](#module\_backup\_instance\_blob\_storage) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_instance_blob_storage/azurerm | ~> 1.0.0 |
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [azurerm_backup_container_storage_account.registration](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/backup_container_storage_account) | resource |
+| [time_sleep.wait_for_backup_rbac](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
+| [time_sleep.wait_for_storage_monitoring](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | target resource group resource mask | `string` | n/a | yes |
+| <a name="input_create_resource_group"></a> [create\_resource\_group](#input\_create\_resource\_group) | Optional override for creating resource group in this module. When null, behavior follows resource\_group\_name nullability. | `bool` | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | (Required) Specifies the supported Azure location where the resource exists. | `string` | n/a | yes |
 | <a name="input_resource_names_map"></a> [resource\_names\_map](#input\_resource\_names\_map) | A map of keys to resource\_name that will be used by tf-launch-module\_library-resource\_name to generate resource names | <pre>map(object({<br/>    name       = string<br/>    max_length = optional(number, 60)<br/>  }))</pre> | <pre>{<br/>  "log_analytics_workspace": {<br/>    "max_length": 80,<br/>    "name": "law"<br/>  },<br/>  "resource_group": {<br/>    "max_length": 80,<br/>    "name": "rg"<br/>  },<br/>  "storage_account": {<br/>    "max_length": 24,<br/>    "name": "sa"<br/>  }<br/>}</pre> | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources | `map(string)` | `{}` | no |
@@ -140,7 +159,7 @@ No resources.
 | <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier) | value of the account\_tier | `string` | `"Standard"` | no |
 | <a name="input_account_replication_type"></a> [account\_replication\_type](#input\_account\_replication\_type) | value of the account\_replication\_type | `string` | `"LRS"` | no |
 | <a name="input_storage_containers"></a> [storage\_containers](#input\_storage\_containers) | map of storage container configs, keyed polymorphically | <pre>map(object({<br/>    name                  = string<br/>    container_access_type = string<br/>  }))</pre> | `{}` | no |
-| <a name="input_storage_shares"></a> [storage\_shares](#input\_storage\_shares) | map of storage file shares configs, keyed polymorphically | <pre>map(object({<br/>    name  = string<br/>    quota = number<br/>  }))</pre> | `{}` | no |
+| <a name="input_storage_shares"></a> [storage\_shares](#input\_storage\_shares) | map of storage file shares configs, keyed polymorphically | <pre>map(object({<br/>    name     = string<br/>    quota    = number<br/>    metadata = optional(map(string))<br/>  }))</pre> | `{}` | no |
 | <a name="input_storage_queues"></a> [storage\_queues](#input\_storage\_queues) | map of storage queue configs, keyed polymorphically | <pre>map(object({<br/>    name = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_static_website"></a> [static\_website](#input\_static\_website) | The static website details if the storage account needs to be used as a static website | <pre>object({<br/>    index_document     = string<br/>    error_404_document = string<br/>  })</pre> | `null` | no |
 | <a name="input_enable_https_traffic_only"></a> [enable\_https\_traffic\_only](#input\_enable\_https\_traffic\_only) | Boolean flag that forces HTTPS traffic only | `bool` | `true` | no |
@@ -150,6 +169,7 @@ No resources.
 | <a name="input_blob_delete_retention_policy"></a> [blob\_delete\_retention\_policy](#input\_blob\_delete\_retention\_policy) | Number of days the blob should be retained. Set 0 to disable | `number` | `0` | no |
 | <a name="input_blob_versioning_enabled"></a> [blob\_versioning\_enabled](#input\_blob\_versioning\_enabled) | Is blob versioning enabled for blob | `bool` | `false` | no |
 | <a name="input_blob_change_feed_enabled"></a> [blob\_change\_feed\_enabled](#input\_blob\_change\_feed\_enabled) | Is the blob service properties for change feed enabled for blob | `bool` | `false` | no |
+| <a name="input_blob_change_feed_retention_in_days"></a> [blob\_change\_feed\_retention\_in\_days](#input\_blob\_change\_feed\_retention\_in\_days) | Number of days to retain blob change feed. Set 0 to disable | `number` | `0` | no |
 | <a name="input_blob_last_access_time_enabled"></a> [blob\_last\_access\_time\_enabled](#input\_blob\_last\_access\_time\_enabled) | Is the last access time based tracking enabled | `bool` | `false` | no |
 | <a name="input_blob_container_delete_retention_policy"></a> [blob\_container\_delete\_retention\_policy](#input\_blob\_container\_delete\_retention\_policy) | Specify the number of days that the container should be retained. Set 0 to disable | `number` | `0` | no |
 | <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled) | Whether the public network access is enabled. Defaults to `true`. | `bool` | `true` | no |
@@ -160,6 +180,12 @@ No resources.
 | <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | n/a | <pre>map(object({<br/>    enabled_log = optional(list(object({<br/>      category_group = optional(string, "allLogs")<br/>      category       = optional(string, null)<br/>    })))<br/>    metrics = optional(list(object({<br/>      category = string<br/>      enabled  = optional(bool)<br/>    })))<br/>  }))</pre> | `{}` | no |
 | <a name="input_log_analytics_workspace"></a> [log\_analytics\_workspace](#input\_log\_analytics\_workspace) | n/a | <pre>object({<br/>    sku               = string<br/>    retention_in_days = number<br/>    daily_quota_gb    = number<br/>    identity = optional(object({<br/>      type         = string<br/>      identity_ids = optional(list(string))<br/>    }))<br/>    local_authentication_disabled = optional(bool)<br/>  })</pre> | `null` | no |
 | <a name="input_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#input\_log\_analytics\_workspace\_id) | (Optional) The ID of the Log Analytics Workspace. | `string` | `null` | no |
+| <a name="input_recovery_services_vault"></a> [recovery\_services\_vault](#input\_recovery\_services\_vault) | Recovery Services Vault configuration | <pre>object({<br/>    name                               = optional(string)<br/>    sku                                = optional(string, "Standard")<br/>    public_network_access_enabled      = optional(bool, true)<br/>    immutability                       = optional(string)<br/>    storage_mode_type                  = optional(string, "GeoRedundant")<br/>    cross_region_restore_enabled       = optional(bool, false)<br/>    soft_delete_enabled                = optional(bool, true)<br/>    classic_vmware_replication_enabled = optional(bool)<br/><br/>    identity = optional(object({<br/>      type         = string<br/>      identity_ids = optional(list(string))<br/>    }))<br/><br/>    encryption = optional(object({<br/>      key_id                            = string<br/>      infrastructure_encryption_enabled = bool<br/>      user_assigned_identity_id         = optional(string)<br/>      use_system_assigned_identity      = optional(bool, true)<br/>    }))<br/><br/>    monitoring = optional(map(any))<br/>  })</pre> | `null` | no |
+| <a name="input_data_protection_backup_vault"></a> [data\_protection\_backup\_vault](#input\_data\_protection\_backup\_vault) | Data Protection Backup Vault configuration | <pre>object({<br/>    name                       = optional(string)<br/>    datastore_type             = optional(string, "VaultStore")<br/>    redundancy                 = optional(string, "LocallyRedundant")<br/>    retention_duration_in_days = optional(number, 14)<br/>    soft_delete                = optional(string, "On")<br/><br/>    identity = optional(object({<br/>      type = string<br/>    }))<br/>  })</pre> | `null` | no |
+| <a name="input_blob_backup_policies"></a> [blob\_backup\_policies](#input\_blob\_backup\_policies) | Blob storage backup policies | <pre>map(object({<br/>    policy_name = string<br/><br/>    backup_repeating_time_intervals        = optional(list(string))<br/>    operational_default_retention_duration = optional(string)<br/>    vault_default_retention_duration       = optional(string)<br/>    time_zone                              = optional(string)<br/><br/>    retention_rules = optional(list(object({<br/>      name     = string<br/>      priority = number<br/><br/>      life_cycle = object({<br/>        data_store_type = string<br/>        duration        = string<br/>      })<br/><br/>      criteria = object({<br/>        absolute_criteria      = optional(string)<br/>        days_of_month          = optional(list(number))<br/>        days_of_week           = optional(list(string))<br/>        months_of_year         = optional(list(string))<br/>        scheduled_backup_times = optional(list(string))<br/>        weeks_of_month         = optional(list(string))<br/>      })<br/>    })), [])<br/><br/>    timeouts = optional(object({<br/>      create = optional(string, "30m")<br/>      read   = optional(string, "5m")<br/>      delete = optional(string, "30m")<br/>    }), {})<br/>  }))</pre> | `{}` | no |
+| <a name="input_file_share_backups"></a> [file\_share\_backups](#input\_file\_share\_backups) | n/a | <pre>map(object({<br/>    file_share_name = string<br/>    policy_key      = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_file_share_backup_policies"></a> [file\_share\_backup\_policies](#input\_file\_share\_backup\_policies) | File share backup policy configuration | <pre>map(object({<br/>    name                  = string<br/>    frequency             = string<br/>    time                  = string<br/>    retention_daily_count = number<br/>  }))</pre> | `{}` | no |
+| <a name="input_blob_backup_instances"></a> [blob\_backup\_instances](#input\_blob\_backup\_instances) | Blob backup instances | <pre>map(object({<br/>    policy_key                      = string<br/>    storage_account_container_names = optional(list(string))<br/>    timeouts = optional(object({<br/>      create = optional(string, "30m")<br/>      read   = optional(string, "5m")<br/>      update = optional(string, "30m")<br/>      delete = optional(string, "30m")<br/>    }), {})<br/>  }))</pre> | `{}` | no |
 
 ## Outputs
 
@@ -178,4 +204,4 @@ No resources.
 | <a name="output_storage_containers"></a> [storage\_containers](#output\_storage\_containers) | Storage container resource map. |
 | <a name="output_storage_queues"></a> [storage\_queues](#output\_storage\_queues) | Storage queues resource map. |
 | <a name="output_storage_shares"></a> [storage\_shares](#output\_storage\_shares) | Storage share resource map. |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
