@@ -246,25 +246,12 @@ module "data_protection_backup_policy_blob_storage" {
   ]
 }
 
-resource "random_uuid" "backup_storage_reader" {
-  count = var.data_protection_backup_vault != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
-}
-
-resource "random_uuid" "backup_storage_backup_contributor" {
-  count = var.data_protection_backup_vault != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
-}
-
-resource "random_uuid" "backup_blob_data_contributor" {
-  count = var.data_protection_backup_vault != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
-}
-
 module "backup_storage_reader" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.2.1"
 
   count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
 
-  name                 = random_uuid.backup_storage_reader[0].result
   scope                = module.storage_account.id
   role_definition_name = "Reader"
   principal_id         = module.data_protection_backup_vault[0].identity[0].principal_id
@@ -282,7 +269,6 @@ module "backup_storage_backup_contributor" {
 
   count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
 
-  name                 = random_uuid.backup_storage_backup_contributor[0].result
   scope                = module.storage_account.id
   role_definition_name = "Storage Account Backup Contributor"
   principal_id         = module.data_protection_backup_vault[0].identity[0].principal_id
@@ -300,7 +286,6 @@ module "backup_blob_data_contributor" {
 
   count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
 
-  name                 = random_uuid.backup_blob_data_contributor[0].result
   scope                = module.storage_account.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = module.data_protection_backup_vault[0].identity[0].principal_id
@@ -312,6 +297,8 @@ module "backup_blob_data_contributor" {
   ]
 }
 
+# Azure RBAC role assignments require time to propagate.
+# Without this delay, backup instance creation fail with permission errors.
 resource "time_sleep" "wait_for_backup_rbac" {
   count = var.data_protection_backup_vault != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
 

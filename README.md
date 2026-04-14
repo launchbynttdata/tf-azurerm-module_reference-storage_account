@@ -110,7 +110,6 @@ If `make check` target is successful, developer is good to commit the code to pr
 |------|---------|
 | <a name="provider_time"></a> [time](#provider\_time) | 0.13.1 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.117.1 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.8.1 |
 
 ## Modules
 
@@ -138,9 +137,6 @@ If `make check` target is successful, developer is good to commit the code to pr
 | Name | Type |
 |------|------|
 | [azurerm_backup_container_storage_account.registration](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/backup_container_storage_account) | resource |
-| [random_uuid.backup_blob_data_contributor](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) | resource |
-| [random_uuid.backup_storage_backup_contributor](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) | resource |
-| [random_uuid.backup_storage_reader](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) | resource |
 | [time_sleep.wait_for_backup_rbac](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [time_sleep.wait_for_storage_monitoring](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 
