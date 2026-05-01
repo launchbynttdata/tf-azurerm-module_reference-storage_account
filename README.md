@@ -109,7 +109,6 @@ If `make check` target is successful, developer is good to commit the code to pr
 | Name | Version |
 |------|---------|
 | <a name="provider_time"></a> [time](#provider\_time) | 0.13.1 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.117.1 |
 
 ## Modules
 
@@ -117,12 +116,13 @@ If `make check` target is successful, developer is good to commit the code to pr
 |------|--------|---------|
 | <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | terraform.registry.launch.nttdata.com/module_library/resource_name/launch | ~> 2.0 |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm | ~> 1.1 |
-| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | terraform.registry.launch.nttdata.com/module_primitive/storage_account/azurerm | ~> 1.3.4 |
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | terraform.registry.launch.nttdata.com/module_primitive/storage_account/azurerm | ~> 1.3.6 |
 | <a name="module_monitor_action_group"></a> [monitor\_action\_group](#module\_monitor\_action\_group) | terraform.registry.launch.nttdata.com/module_primitive/monitor_action_group/azurerm | ~> 1.0.1 |
 | <a name="module_monitor_metric_alert"></a> [monitor\_metric\_alert](#module\_monitor\_metric\_alert) | terraform.registry.launch.nttdata.com/module_primitive/monitor_metric_alert/azurerm | ~> 2.0 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | terraform.registry.launch.nttdata.com/module_primitive/log_analytics_workspace/azurerm | ~> 1.2.5 |
 | <a name="module_diagnostic_setting"></a> [diagnostic\_setting](#module\_diagnostic\_setting) | terraform.registry.launch.nttdata.com/module_primitive/monitor_diagnostic_setting/azurerm | ~> 3.1.2 |
 | <a name="module_recovery_services_vault"></a> [recovery\_services\_vault](#module\_recovery\_services\_vault) | terraform.registry.launch.nttdata.com/module_primitive/recovery_services_vault/azurerm | ~> 1.0.2 |
+| <a name="module_backup_container_storage_account"></a> [backup\_container\_storage\_account](#module\_backup\_container\_storage\_account) | terraform.registry.launch.nttdata.com/module_primitive/backup_container_storage_account/azurerm | ~> 1.0.0 |
 | <a name="module_data_protection_backup_vault"></a> [data\_protection\_backup\_vault](#module\_data\_protection\_backup\_vault) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_vault/azurerm | ~> 0.1.3 |
 | <a name="module_data_protection_backup_policy_blob_storage"></a> [data\_protection\_backup\_policy\_blob\_storage](#module\_data\_protection\_backup\_policy\_blob\_storage) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_policy_blob_storage/azurerm | ~> 1.0.2 |
 | <a name="module_backup_storage_reader"></a> [backup\_storage\_reader](#module\_backup\_storage\_reader) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.2.1 |
@@ -130,13 +130,12 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="module_backup_blob_data_contributor"></a> [backup\_blob\_data\_contributor](#module\_backup\_blob\_data\_contributor) | terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm | ~> 1.2.1 |
 | <a name="module_backup_policy_file_share"></a> [backup\_policy\_file\_share](#module\_backup\_policy\_file\_share) | terraform.registry.launch.nttdata.com/module_primitive/backup_policy_file_share/azurerm | ~> 1.0.1 |
 | <a name="module_backup_protected_file_share"></a> [backup\_protected\_file\_share](#module\_backup\_protected\_file\_share) | terraform.registry.launch.nttdata.com/module_primitive/backup_protected_file_share/azurerm | ~> 0.1.3 |
-| <a name="module_backup_instance_blob_storage"></a> [backup\_instance\_blob\_storage](#module\_backup\_instance\_blob\_storage) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_instance_blob_storage/azurerm | ~> 1.0.0 |
+| <a name="module_backup_instance_blob_storage"></a> [backup\_instance\_blob\_storage](#module\_backup\_instance\_blob\_storage) | terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_instance_blob_storage/azurerm | ~> 1.0.1 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [azurerm_backup_container_storage_account.registration](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/backup_container_storage_account) | resource |
 | [time_sleep.wait_for_backup_rbac](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [time_sleep.wait_for_storage_monitoring](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 
@@ -204,4 +203,10 @@ If `make check` target is successful, developer is good to commit the code to pr
 | <a name="output_storage_containers"></a> [storage\_containers](#output\_storage\_containers) | Storage container resource map. |
 | <a name="output_storage_queues"></a> [storage\_queues](#output\_storage\_queues) | Storage queues resource map. |
 | <a name="output_storage_shares"></a> [storage\_shares](#output\_storage\_shares) | Storage share resource map. |
+| <a name="output_recovery_services_vault_id"></a> [recovery\_services\_vault\_id](#output\_recovery\_services\_vault\_id) | The ID of the Recovery Services Vault. |
+| <a name="output_data_protection_backup_vault_id"></a> [data\_protection\_backup\_vault\_id](#output\_data\_protection\_backup\_vault\_id) | The ID of the Data Protection Backup Vault. |
+| <a name="output_backup_policy_file_share_ids"></a> [backup\_policy\_file\_share\_ids](#output\_backup\_policy\_file\_share\_ids) | Map of file share backup policy names to their IDs. |
+| <a name="output_data_protection_backup_policy_blob_storage_ids"></a> [data\_protection\_backup\_policy\_blob\_storage\_ids](#output\_data\_protection\_backup\_policy\_blob\_storage\_ids) | Map of blob storage backup policy names to their IDs. |
+| <a name="output_backup_protected_file_share_ids"></a> [backup\_protected\_file\_share\_ids](#output\_backup\_protected\_file\_share\_ids) | Map of protected file share names to their IDs. |
+| <a name="output_backup_instance_blob_storage_ids"></a> [backup\_instance\_blob\_storage\_ids](#output\_backup\_instance\_blob\_storage\_ids) | Map of blob storage backup instance names to their IDs. |
 <!-- END_TF_DOCS -->

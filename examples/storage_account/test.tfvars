@@ -16,7 +16,7 @@ resource_names_map = {
   }
 
 }
-instance_env = 11
+instance_env = 12
 
 recovery_services_vault = {
   sku                           = "Standard"
@@ -59,6 +59,13 @@ file_share_backups = {
   share1 = {
     file_share_name = "share1"
     policy_key      = "daily_file_share_policy"
+  }
+}
+
+storage_containers = {
+  storage_container_1 = {
+    name                  = "container1"
+    container_access_type = "private"
   }
 }
 

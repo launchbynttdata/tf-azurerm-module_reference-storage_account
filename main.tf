@@ -40,7 +40,7 @@ module "resource_group" {
 
 module "storage_account" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/storage_account/azurerm"
-  version = "~> 1.3.4"
+  version = "~> 1.3.6"
 
   resource_group_name  = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
   location             = var.location
@@ -181,14 +181,16 @@ module "recovery_services_vault" {
     module.storage_account
   ]
 }
-resource "azurerm_backup_container_storage_account" "registration" {
+
+module "backup_container_storage_account" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/backup_container_storage_account/azurerm"
+  version = "~> 1.0.0"
+
   count = var.recovery_services_vault != null && var.file_share_backups != null && length(var.file_share_backups) > 0 ? 1 : 0
 
   resource_group_name = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
-
   recovery_vault_name = module.recovery_services_vault[0].vault_name
-
-  storage_account_id = module.storage_account.id
+  storage_account_id  = module.storage_account.id
 
   depends_on = [
     module.recovery_services_vault,
@@ -348,7 +350,7 @@ module "backup_protected_file_share" {
   backup_policy_id = module.backup_policy_file_share[each.value.policy_key].backup_policy_file_share_id
 
   depends_on = [
-    azurerm_backup_container_storage_account.registration,
+    module.backup_container_storage_account,
     module.storage_account,
     module.backup_policy_file_share
   ]
@@ -356,7 +358,8 @@ module "backup_protected_file_share" {
 
 module "backup_instance_blob_storage" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/data_protection_backup_instance_blob_storage/azurerm"
-  version = "~> 1.0.0"
+  version = "~> 1.0.1"
+
 
   for_each = var.data_protection_backup_vault != null && var.blob_backup_instances != null ? var.blob_backup_instances : {}
 
