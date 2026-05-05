@@ -1,6 +1,6 @@
 # storage_account
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -37,10 +37,20 @@ No resources.
 | <a name="input_class_env"></a> [class\_env](#input\_class\_env) | (Required) Environment where resource is going to be deployed. For example. dev, qa, uat | `string` | `"dev"` | no |
 | <a name="input_storage_account_name"></a> [storage\_account\_name](#input\_storage\_account\_name) | The name of the storage account. | `string` | `null` | no |
 | <a name="input_storage_containers"></a> [storage\_containers](#input\_storage\_containers) | map of storage container configs, keyed polymorphically | <pre>map(object({<br/>    name                  = string<br/>    container_access_type = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_blob_versioning_enabled"></a> [blob\_versioning\_enabled](#input\_blob\_versioning\_enabled) | Enable blob versioning for backup compatibility | `bool` | `false` | no |
+| <a name="input_blob_change_feed_enabled"></a> [blob\_change\_feed\_enabled](#input\_blob\_change\_feed\_enabled) | Enable blob change feed for backup compatibility | `bool` | `false` | no |
+| <a name="input_blob_change_feed_retention_in_days"></a> [blob\_change\_feed\_retention\_in\_days](#input\_blob\_change\_feed\_retention\_in\_days) | Number of days to retain blob change feed. Set 0 to disable | `number` | `0` | no |
 | <a name="input_action_group"></a> [action\_group](#input\_action\_group) | An action group object. Each action group can have:<br/>  - short\_name: (Required) The short name of the action group<br/>  - arm\_role\_receivers: (Optional) List of ARM role receivers<br/>  - email\_receivers: (Optional) List of email receivers | <pre>object({<br/>    name       = string<br/>    short_name = string<br/>    arm_role_receivers = optional(list(object({<br/>      name                    = string<br/>      role_id                 = string<br/>      use_common_alert_schema = optional(bool)<br/>    })), [])<br/>    email_receivers = optional(list(object({<br/>      name                    = string<br/>      email_address           = string<br/>      use_common_alert_schema = optional(bool)<br/>    })), [])<br/>  })</pre> | `null` | no |
 | <a name="input_metric_alerts"></a> [metric\_alerts](#input\_metric\_alerts) | Monitor Metric Alert Properties | <pre>map(object({<br/>    description        = string<br/>    action_groups      = optional(set(string), [])<br/>    frequency          = optional(string, "PT1M")<br/>    severity           = optional(number, 3)<br/>    enabled            = optional(bool, true)<br/>    webhook_properties = optional(map(string))<br/>    criteria = optional(list(object({<br/>      metric_namespace       = string<br/>      metric_name            = string<br/>      aggregation            = string<br/>      operator               = string<br/>      threshold              = number<br/>      skip_metric_validation = optional(bool, false)<br/>      dimensions = optional(list(object({<br/>        name     = string<br/>        operator = string<br/>        values   = list(string)<br/>      })))<br/>    })))<br/>    dynamic_criteria = optional(object({<br/>      metric_namespace       = string<br/>      metric_name            = string<br/>      aggregation            = string<br/>      operator               = string<br/>      alert_sensitivity      = string<br/>      ignore_data_before     = optional(string)<br/>      skip_metric_validation = optional(bool, false)<br/>      dimensions = optional(list(object({<br/>        name     = string<br/>        operator = string<br/>        values   = list(string)<br/>      })))<br/>    }))<br/>  }))</pre> | `{}` | no |
 | <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | n/a | <pre>map(object({<br/>    enabled_log = optional(list(object({<br/>      category_group = optional(string, "allLogs")<br/>      category       = optional(string, null)<br/>    })))<br/>    metrics = optional(list(object({<br/>      category = string<br/>      enabled  = optional(bool)<br/>    })))<br/>  }))</pre> | `{}` | no |
 | <a name="input_log_analytics_workspace"></a> [log\_analytics\_workspace](#input\_log\_analytics\_workspace) | n/a | <pre>object({<br/>    sku               = string<br/>    retention_in_days = number<br/>    daily_quota_gb    = number<br/>    identity = optional(object({<br/>      type         = string<br/>      identity_ids = optional(list(string))<br/>    }))<br/>    local_authentication_disabled = optional(bool)<br/>  })</pre> | `null` | no |
+| <a name="input_recovery_services_vault"></a> [recovery\_services\_vault](#input\_recovery\_services\_vault) | n/a | `any` | `null` | no |
+| <a name="input_data_protection_backup_vault"></a> [data\_protection\_backup\_vault](#input\_data\_protection\_backup\_vault) | n/a | `any` | `null` | no |
+| <a name="input_blob_backup_policies"></a> [blob\_backup\_policies](#input\_blob\_backup\_policies) | n/a | `any` | `{}` | no |
+| <a name="input_file_share_backups"></a> [file\_share\_backups](#input\_file\_share\_backups) | n/a | `any` | `{}` | no |
+| <a name="input_file_share_backup_policies"></a> [file\_share\_backup\_policies](#input\_file\_share\_backup\_policies) | n/a | `any` | `{}` | no |
+| <a name="input_storage_shares"></a> [storage\_shares](#input\_storage\_shares) | map of storage file shares configs, keyed polymorphically | <pre>map(object({<br/>    name     = string<br/>    quota    = number<br/>    metadata = optional(map(string))<br/>  }))</pre> | `{}` | no |
+| <a name="input_blob_backup_instances"></a> [blob\_backup\_instances](#input\_blob\_backup\_instances) | n/a | <pre>map(object({<br/>    policy_key                      = string<br/>    storage_account_container_names = optional(list(string))<br/>    timeouts = optional(object({<br/>      create = optional(string, "30m")<br/>      read   = optional(string, "5m")<br/>      update = optional(string, "30m")<br/>      delete = optional(string, "30m")<br/>    }), {})<br/>  }))</pre> | `{}` | no |
 
 ## Outputs
 
@@ -59,4 +69,4 @@ No resources.
 | <a name="output_storage_containers"></a> [storage\_containers](#output\_storage\_containers) | Storage container resource map. |
 | <a name="output_storage_queues"></a> [storage\_queues](#output\_storage\_queues) | Storage queues resource map. |
 | <a name="output_storage_shares"></a> [storage\_shares](#output\_storage\_shares) | Storage share resource map. |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->

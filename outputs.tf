@@ -76,5 +76,57 @@ output "storage_queues" {
 
 output "storage_shares" {
   description = "Storage share resource map."
-  value       = try(module.storage_account.storage_shares, null)
+  value = try({
+    for key, share in module.storage_account.storage_shares : key => {
+      access_tier          = try(share.access_tier, null)
+      acl                  = try(share.acl, [])
+      enabled_protocol     = try(share.enabled_protocol, null)
+      id                   = share.id
+      metadata             = { for mk, mv in try(share.metadata, {}) : mk => mv if lower(mk) != "azurebackupprotected" }
+      name                 = share.name
+      quota                = share.quota
+      resource_manager_id  = try(share.resource_manager_id, null)
+      storage_account_name = try(share.storage_account_name, null)
+      timeouts             = try(share.timeouts, null)
+      url                  = try(share.url, null)
+    }
+  }, null)
+}
+
+output "recovery_services_vault_id" {
+  description = "The ID of the Recovery Services Vault."
+  value       = try(module.recovery_services_vault[0].vault_id, null)
+}
+
+output "data_protection_backup_vault_id" {
+  description = "The ID of the Data Protection Backup Vault."
+  value       = try(module.data_protection_backup_vault[0].vault_id, null)
+}
+
+output "backup_policy_file_share_ids" {
+  description = "Map of file share backup policy names to their IDs."
+  value = try({
+    for key, policy in module.backup_policy_file_share : key => policy.backup_policy_file_share_id
+  }, {})
+}
+
+output "data_protection_backup_policy_blob_storage_ids" {
+  description = "Map of blob storage backup policy names to their IDs."
+  value = try({
+    for key, policy in module.data_protection_backup_policy_blob_storage : key => policy.id
+  }, {})
+}
+
+output "backup_protected_file_share_ids" {
+  description = "Map of protected file share names to their IDs."
+  value = try({
+    for key, instance in module.backup_protected_file_share : key => instance.protected_file_share_id
+  }, {})
+}
+
+output "backup_instance_blob_storage_ids" {
+  description = "Map of blob storage backup instance names to their IDs."
+  value = try({
+    for key, instance in module.backup_instance_blob_storage : key => instance.backup_instance_id
+  }, {})
 }

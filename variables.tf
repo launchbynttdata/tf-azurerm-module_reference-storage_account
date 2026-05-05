@@ -16,6 +16,12 @@ variable "resource_group_name" {
   type        = string
 }
 
+variable "create_resource_group" {
+  description = "Optional override for creating resource group in this module. When null, behavior follows resource_group_name nullability."
+  type        = bool
+  default     = null
+}
+
 variable "location" {
   type        = string
   description = "(Required) Specifies the supported Azure location where the resource exists."
@@ -154,8 +160,9 @@ variable "storage_containers" {
 variable "storage_shares" {
   description = "map of storage file shares configs, keyed polymorphically"
   type = map(object({
-    name  = string
-    quota = number
+    name     = string
+    quota    = number
+    metadata = optional(map(string))
   }))
   default = {}
 }
@@ -231,6 +238,12 @@ variable "blob_change_feed_enabled" {
   description = "Is the blob service properties for change feed enabled for blob"
   type        = bool
   default     = false
+}
+
+variable "blob_change_feed_retention_in_days" {
+  description = "Number of days to retain blob change feed. Set 0 to disable"
+  type        = number
+  default     = 0
 }
 
 variable "blob_last_access_time_enabled" {
@@ -375,4 +388,127 @@ variable "log_analytics_workspace_id" {
   type        = string
   description = "(Optional) The ID of the Log Analytics Workspace."
   default     = null
+}
+
+variable "recovery_services_vault" {
+  description = "Recovery Services Vault configuration"
+  type = object({
+    name                               = optional(string)
+    sku                                = optional(string, "Standard")
+    public_network_access_enabled      = optional(bool, true)
+    immutability                       = optional(string)
+    storage_mode_type                  = optional(string, "GeoRedundant")
+    cross_region_restore_enabled       = optional(bool, false)
+    soft_delete_enabled                = optional(bool, true)
+    classic_vmware_replication_enabled = optional(bool)
+
+    identity = optional(object({
+      type         = string
+      identity_ids = optional(list(string))
+    }))
+
+    encryption = optional(object({
+      key_id                            = string
+      infrastructure_encryption_enabled = bool
+      user_assigned_identity_id         = optional(string)
+      use_system_assigned_identity      = optional(bool, true)
+    }))
+
+    monitoring = optional(map(any))
+  })
+
+  default = null
+}
+
+variable "data_protection_backup_vault" {
+  description = "Data Protection Backup Vault configuration"
+
+  type = object({
+    name                       = optional(string)
+    datastore_type             = optional(string, "VaultStore")
+    redundancy                 = optional(string, "LocallyRedundant")
+    retention_duration_in_days = optional(number, 14)
+    soft_delete                = optional(string, "On")
+
+    identity = optional(object({
+      type = string
+    }))
+  })
+
+  default = null
+}
+
+variable "blob_backup_policies" {
+  description = "Blob storage backup policies"
+
+  type = map(object({
+    policy_name = string
+
+    backup_repeating_time_intervals        = optional(list(string))
+    operational_default_retention_duration = optional(string)
+    vault_default_retention_duration       = optional(string)
+    time_zone                              = optional(string)
+
+    retention_rules = optional(list(object({
+      name     = string
+      priority = number
+
+      life_cycle = object({
+        data_store_type = string
+        duration        = string
+      })
+
+      criteria = object({
+        absolute_criteria      = optional(string)
+        days_of_month          = optional(list(number))
+        days_of_week           = optional(list(string))
+        months_of_year         = optional(list(string))
+        scheduled_backup_times = optional(list(string))
+        weeks_of_month         = optional(list(string))
+      })
+    })), [])
+
+    timeouts = optional(object({
+      create = optional(string, "30m")
+      read   = optional(string, "5m")
+      delete = optional(string, "30m")
+    }), {})
+  }))
+
+  default = {}
+}
+
+variable "file_share_backups" {
+  type = map(object({
+    file_share_name = string
+    policy_key      = string
+  }))
+  default = {}
+}
+
+variable "file_share_backup_policies" {
+  description = "File share backup policy configuration"
+
+  type = map(object({
+    name                  = string
+    frequency             = string
+    time                  = string
+    retention_daily_count = number
+  }))
+
+  default = {}
+}
+variable "blob_backup_instances" {
+  description = "Blob backup instances"
+  type = map(object({
+    policy_key                      = string
+    storage_account_container_names = optional(list(string))
+    timeouts = optional(object({
+      create = optional(string, "30m")
+      read   = optional(string, "5m")
+      update = optional(string, "30m")
+      delete = optional(string, "30m")
+    }), {})
+  }))
+  default = {}
 }
