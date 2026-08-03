@@ -40,7 +40,7 @@ module "resource_group" {
 
 module "storage_account" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/storage_account/azurerm"
-  version = "~> 1.3.6"
+  version = "~> 2.0"
 
   resource_group_name  = coalesce(var.resource_group_name, module.resource_names["resource_group"].standard)
   location             = var.location
@@ -64,6 +64,7 @@ module "storage_account" {
   blob_last_access_time_enabled          = var.blob_last_access_time_enabled
   blob_container_delete_retention_policy = var.blob_container_delete_retention_policy
   public_network_access_enabled          = var.public_network_access_enabled
+  allow_nested_items_to_be_public        = var.allow_nested_items_to_be_public
   network_rules                          = var.network_rules
 
   tags = merge(local.tags, var.tags, { resource_name = coalesce(var.storage_account_name, module.resource_names["storage_account"].standard) })
@@ -252,7 +253,7 @@ module "backup_storage_reader" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.2.1"
 
-  count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
+  count = var.data_protection_backup_vault != null && try(var.data_protection_backup_vault.identity, null) != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
 
   scope                = module.storage_account.id
   role_definition_name = "Reader"
@@ -269,7 +270,7 @@ module "backup_storage_backup_contributor" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.2.1"
 
-  count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
+  count = var.data_protection_backup_vault != null && try(var.data_protection_backup_vault.identity, null) != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
 
   scope                = module.storage_account.id
   role_definition_name = "Storage Account Backup Contributor"
@@ -286,7 +287,7 @@ module "backup_blob_data_contributor" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/role_assignment/azurerm"
   version = "~> 1.2.1"
 
-  count = var.data_protection_backup_vault != null && var.data_protection_backup_vault.identity != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
+  count = var.data_protection_backup_vault != null && try(var.data_protection_backup_vault.identity, null) != null && var.blob_backup_instances != null && length(var.blob_backup_instances) > 0 ? 1 : 0
 
   scope                = module.storage_account.id
   role_definition_name = "Storage Blob Data Contributor"

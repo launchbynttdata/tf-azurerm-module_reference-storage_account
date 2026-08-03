@@ -69,6 +69,8 @@ storage_containers = {
   }
 }
 
+allow_nested_items_to_be_public = false
+
 blob_versioning_enabled            = true
 blob_change_feed_enabled           = true
 blob_change_feed_retention_in_days = 7

@@ -264,6 +264,12 @@ variable "public_network_access_enabled" {
   default     = true
 }
 
+variable "allow_nested_items_to_be_public" {
+  description = "Allow or disallow anonymous public read access for containers and blobs."
+  type        = bool
+  default     = false
+}
+
 variable "network_rules" {
   description = "An object defining rules around network access for the Storage Account."
   type = object({
