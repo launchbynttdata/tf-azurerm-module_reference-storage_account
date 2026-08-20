@@ -34,5 +34,5 @@ func TestStorageAccountModule(t *testing.T) {
 		SetTestSpecificFlags(map[string]types.TestFlags{}).
 		Build()
 
-	lib.RunNonDestructiveTest(t, *ctx, testimpl.TestStorageAccount)
+	lib.RunNonDestructiveTest(t, *ctx, testimpl.TestComposableStorageAccount)
 }

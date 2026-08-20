@@ -84,6 +84,12 @@ variable "storage_account_name" {
   default     = null
 }
 
+variable "allow_nested_items_to_be_public" {
+  description = "Allow or disallow anonymous public read access for containers and blobs."
+  type        = bool
+  default     = false
+}
+
 variable "storage_containers" {
   description = "map of storage container configs, keyed polymorphically"
   type = map(object({

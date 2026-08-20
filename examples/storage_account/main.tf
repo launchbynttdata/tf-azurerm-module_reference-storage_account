@@ -38,11 +38,14 @@ module "resource_group" {
 module "storage_account" {
   source = "../.."
 
-  resource_names_map         = var.resource_names_map
-  resource_group_name        = local.resource_group_name
-  create_resource_group      = false
-  location                   = var.location
-  storage_account_name       = coalesce(var.storage_account_name, local.storage_account_name)
+  resource_names_map    = var.resource_names_map
+  resource_group_name   = local.resource_group_name
+  create_resource_group = false
+  location              = var.location
+  storage_account_name  = coalesce(var.storage_account_name, local.storage_account_name)
+
+  allow_nested_items_to_be_public = var.allow_nested_items_to_be_public
+
   file_share_backup_policies = var.file_share_backup_policies
 
   storage_containers = merge(var.storage_containers, {

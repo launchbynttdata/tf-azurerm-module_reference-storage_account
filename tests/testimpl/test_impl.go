@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStorageAccount(t *testing.T, ctx types.TestContext) {
+func TestComposableStorageAccount(t *testing.T, ctx types.TestContext) {
 	subscriptionId := os.Getenv("ARM_SUBSCRIPTION_ID")
 	if len(subscriptionId) == 0 {
 		t.Fatal("ARM_SUBSCRIPTION_ID environment variable is not set")
@@ -75,6 +75,11 @@ func TestStorageAccount(t *testing.T, ctx types.TestContext) {
 
 		assert.Contains(t, string(body), "<h1>Example Storage Account Website</h1>", "Body did not contain expected response!")
 	})
+}
+
+// Backward-compatible alias for existing non-readonly callers.
+func TestStorageAccount(t *testing.T, ctx types.TestContext) {
+	TestComposableStorageAccount(t, ctx)
 }
 
 func getStorageAccountName(input string) string {
